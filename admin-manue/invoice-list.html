@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice List - Bluemoon Production</title>
+    <link rel="icon" type="image/png" href="../images/bm_favicon.png">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/invoice.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 3D CDNs -->
+    <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+    <script src="https://cdn.skypack.dev/gsap@3.12.5"></script>
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+
+<body>
+    <!-- Admin Sidebar -->
+    <nav class="admin-sidebar" id="adminSidebar">
+        <div class="admin-sidebar-header">
+            <i class="fas fa-moon logo-icon"></i>
+        </div>
+        <ul class="admin-menu">
+            <li class="admin-menu-item">
+                <a href="invoice.html">
+                    <i class="fas fa-file-invoice-dollar icon"></i>
+                    <span class="text">Invoice Generator</span>
+                </a>
+            </li>
+            <li class="admin-menu-item">
+                <a href="invoice-list.html" id="adminViewInvoices">
+                    <i class="fas fa-list-alt icon"></i>
+                    <span class="text">View Invoices</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="top-nav-bar">
+        <a href="../index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Home</a>
+        <div class="nav-logo">
+            <img class="invoice-logo" src="../images/bluemoon_production.gif" alt="Bluemoon Production"
+                onerror="this.style.display='none'">
+        </div>
+    </div>
+
+    <div class="invoice-list-header">
+        <div class="container">
+            <h1>📋 Invoice List</h1>
+            <p>Manage all your invoices</p>
+        </div>
+    </div>
+
+
+    <div class="invoice-list-container">
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalInvoices">0</div>
+                <div>Total Invoices</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalAmount">₹0</div>
+                <div>Total Amount</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="paidInvoices">0</div>
+                <div>Paid</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="pendingInvoices">0</div>
+                <div>Pending</div>
+            </div>
+        </div>
+
+        <!-- Invoice Grid -->
+        <div id="invoiceList"></div>
+        <div id="noInvoices" class="no-invoices" style="display: none;">
+            <i class="fas fa-inbox" style="font-size: 4rem; color: #ccc; margin-bottom: 20px;"></i>
+            <h2>No Invoices Found</h2>
+            <p>Create your first invoice to get started.</p>
+            <a href="invoice.html" class="generate-new-btn">➕ Create First Invoice</a>
+        </div>
+    </div>
+
+    <!-- 3D Canvas -->
+    <div id="invoice-list-canvas" class="three-canvas gsap-3d-float"></div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/theme.js"></script>
+    <script src="../js/three-setup.js"></script>
+    <script src="../js/main.js"></script>
+    <script>
+        // Init 3D scene for list
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.ThreeSetup) {
+                window.ThreeSetup.init();
+            }
+        });
+    </script>
+    <script src="../js/invoice-list.js"></script>
+    <script src="../js/animations.js"></script>
+</body>
+
+</html>

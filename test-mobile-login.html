@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Login/Logout Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            background: #f5f5f5;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+        .test-button {
+            background: #e94560;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #d63850;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        code {
+            background: #333;
+            color: #0f0;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Mobile Login/Logout Test Page</h1>
+    
+    <div class="test-section">
+        <h2>Current Status</h2>
+        <div id="currentStatus" class="status info">Checking...</div>
+        <div id="mobileElements" class="status info">Checking mobile elements...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Quick Tests</h2>
+        <button class="test-button" onclick="testLogin()">Simulate Login</button>
+        <button class="test-button" onclick="testLogout()">Simulate Logout</button>
+        <button class="test-button" onclick="checkMobileElements()">Check Mobile Elements</button>
+        <button class="test-button" onclick="clearStorage()">Clear Storage</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="testResults"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Instructions</h2>
+        <ol>
+            <li>Resize your browser to mobile width (&lt; 768px) or use mobile device</li>
+            <li>Click "Simulate Login" to test logged-in state</li>
+            <li>Open the main site and check hamburger menu</li>
+            <li>You should see profile with logout button</li>
+            <li>Click "Simulate Logout" to test logged-out state</li>
+            <li>Check hamburger menu again</li>
+            <li>You should see login button</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2>Debug Info</h2>
+        <div id="debugInfo"></div>
+    </div>
+
+    <script>
+        function updateStatus() {
+            const user = localStorage.getItem('user');
+            const statusDiv = document.getElementById('currentStatus');
+            
+            if (user) {
+                const userData = JSON.parse(user);
+                statusDiv.className = 'status success';
+                statusDiv.innerHTML = `
+                    ✅ <strong>Logged In</strong><br>
+                    Name: ${userData.fullName}<br>
+                    Email: ${userData.email}<br>
+                    Role: ${userData.role || 'User'}
+                `;
+            } else {
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = '❌ <strong>Not Logged In</strong>';
+            }
+            
+            updateDebugInfo();
+        }
+
+        function testLogin() {
+            const testUser = {
+                fullName: 'Test User',
+                stageName: 'TestStage',
+                email: 'test@example.com',
+                phone: '1234567890',
+                role: 'Admin',
+                status: 'Active'
+            };
+            
+            localStorage.setItem('user', JSON.stringify(testUser));
+            addResult('✅ Simulated login successful', 'success');
+            updateStatus();
+            
+            setTimeout(() => {
+                addResult('ℹ️ Now open index.html and check the hamburger menu', 'info');
+                addResult('ℹ️ You should see profile with logout button', 'info');
+            }, 500);
+        }
+
+        function testLogout() {
+            localStorage.removeItem('user');
+            addResult('✅ Simulated logout successful', 'success');
+            updateStatus();
+            
+            setTimeout(() => {
+                addResult('ℹ️ Now open index.html and check the hamburger menu', 'info');
+                addResult('ℹ️ You should see login button', 'info');
+            }, 500);
+        }
+
+        function checkMobileElements() {
+            // This would need to be run on the actual page
+            addResult('ℹ️ Open browser console on index.html and run:', 'info');
+            addResult('<code>document.querySelector(".mobile-login")</code>', 'info');
+            addResult('<code>document.querySelector(".mobile-profile")</code>', 'info');
+        }
+
+        function clearStorage() {
+            localStorage.clear();
+            addResult('✅ Storage cleared', 'success');
+            updateStatus();
+        }
+
+        function addResult(message, type) {
+            const resultsDiv = document.getElementById('testResults');
+            const resultItem = document.createElement('div');
+            resultItem.className = `status ${type}`;
+            resultItem.innerHTML = message;
+            resultsDiv.insertBefore(resultItem, resultsDiv.firstChild);
+        }
+
+        function updateDebugInfo() {
+            const debugDiv = document.getElementById('debugInfo');
+            const user = localStorage.getItem('user');
+            
+            debugDiv.innerHTML = `
+                <p><strong>localStorage.user:</strong></p>
+                <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; overflow-x: auto;">${user || 'null'}</pre>
+                
+                <p><strong>Screen Width:</strong> ${window.innerWidth}px</p>
+                <p><strong>Is Mobile:</strong> ${window.innerWidth <= 768 ? 'Yes' : 'No'}</p>
+                
+                <p><strong>Console Commands to Test:</strong></p>
+                <code>localStorage.getItem('user')</code><br>
+                <code>document.querySelector('.mobile-login')</code><br>
+                <code>document.querySelector('.mobile-profile')</code><br>
+                <code>window.authModal</code><br>
+                <code>window.showLoginForm</code>
+            `;
+        }
+
+        // Initialize
+        updateStatus();
+        
+        // Update on storage change
+        window.addEventListener('storage', updateStatus);
+        
+        // Update on resize
+        window.addEventListener('resize', updateDebugInfo);
+    </script>
+</body>
+</html>

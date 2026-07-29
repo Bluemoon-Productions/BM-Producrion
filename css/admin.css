@@ -1,0 +1,166 @@
+/* ============================================================
+   ADMIN SIDEBAR
+   ============================================================ */
+
+.admin-sidebar {
+    display: none; /* Hidden by default, shown via .admin-view on body */
+    background: #0a0a14;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    z-index: 999;
+}
+
+/* Add padding/margin to body when admin view is active */
+body.admin-view {
+    transition: padding-left 0.3s ease, padding-bottom 0.3s ease;
+}
+
+/* ------------------------------------------------------------
+   DESKTOP - Vertical Sidebar (Left)
+   ------------------------------------------------------------ */
+@media (min-width: 769px) {
+    body.admin-view {
+        padding-left: 100px; /* Width of collapsed sidebar (80px) + body padding (20px) */
+    }
+
+    body.admin-view .admin-sidebar {
+        display: block;
+    }
+
+    .admin-sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        width: 80px;
+        transition: width 0.3s ease;
+        overflow: hidden;
+    }
+
+    .admin-sidebar:hover,
+    .admin-sidebar.expanded {
+        width: 250px; /* Width of expanded sidebar */
+    }
+
+    .admin-sidebar-header {
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 70px; /* Match navbar height */
+    }
+
+    .admin-sidebar-header .logo-icon {
+        font-size: 2rem;
+        color: var(--highlight-color);
+        transition: transform 0.3s ease;
+    }
+
+    .admin-sidebar:hover .logo-icon {
+        transform: rotate(360deg);
+    }
+
+    .admin-menu {
+        list-style: none;
+        padding: 20px 0;
+        margin: 0;
+    }
+
+    .admin-menu-item a {
+        display: flex;
+        align-items: center;
+        padding: 15px 25px;
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+        white-space: nowrap;
+        transition: background 0.3s, color 0.3s;
+    }
+
+    .admin-menu-item a:hover {
+        background: var(--highlight-color);
+        color: #fff;
+    }
+
+    .admin-menu-item .icon {
+        font-size: 1.4rem;
+        min-width: 30px;
+        text-align: center;
+    }
+
+    .admin-menu-item .text {
+        margin-left: 20px;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+    .admin-sidebar:hover .admin-menu-item .text,
+    .admin-sidebar.expanded .admin-menu-item .text {
+        opacity: 1;
+        transition-delay: 0.1s;
+    }
+}
+
+/* ------------------------------------------------------------
+   MOBILE - Bottom Bar
+   ------------------------------------------------------------ */
+@media (max-width: 768px) {
+    body.admin-view .admin-sidebar {
+        display: flex;
+    }
+
+    body.admin-view {
+        padding-bottom: 80px; /* Height of bottom bar (60px) + body padding (20px) */
+    }
+
+    .admin-sidebar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 60px;
+        border-right: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(10, 10, 20, 0.9);
+        backdrop-filter: blur(10px);
+        align-items: center;
+    }
+
+    .admin-sidebar-header {
+        display: none; /* No header on mobile */
+    }
+
+    .admin-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        justify-content: space-around;
+        height: 100%;
+        width: 100%;
+    }
+
+    .admin-menu-item {
+        flex: 1;
+    }
+
+    .admin-menu-item a {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+        font-size: 0.7rem;
+        transition: color 0.3s;
+    }
+    
+    .admin-menu-item a:hover,
+    .admin-menu-item a.active {
+        color: var(--highlight-color);
+    }
+
+    .admin-menu-item .icon {
+        font-size: 1.2rem;
+        margin-bottom: 4px;
+    }
+}

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Invoice - Bluemoon Production</title>
+    <link rel="icon" type="image/png" href="../images/bm_favicon.png">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/invoice.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Admin Sidebar -->
+        <nav class="admin-sidebar" id="adminSidebar">
+            <div class="admin-sidebar-header">
+                <i class="fas fa-moon logo-icon"></i>
+            </div>
+            <ul class="admin-menu">
+                <li class="admin-menu-item">
+                    <a href="invoice.html">
+                        <i class="fas fa-file-invoice-dollar icon"></i>
+                        <span class="text">Invoice Generator</span>
+                    </a>
+                </li>
+                <li class="admin-menu-item">
+                    <a href="invoice-list.html" id="adminViewInvoices">
+                        <i class="fas fa-list-alt icon"></i>
+                        <span class="text">View Invoices</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <div class="top-nav-bar">
+            <a href="../index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Home</a>
+            <div class="nav-logo">
+                <img class="invoice-logo" src="../images/bluemoon_production.gif" alt="Bluemoon Production" onerror="this.style.display='none'">
+                <!-- <span>Bluemoon Production</span> -->
+            </div>
+            <button class="view-invoices-btn" id="viewInvoicesBtn">📋 View Invoice List</button>
+        </div>
+        
+        <div class="invoice-header">
+            <h1>Generate Invoice</h1>
+            <p>Create professional invoices for your clients</p>
+        </div>
+
+        <!-- Invoice List Modal -->
+        <div id="invoiceListModal" class="invoice-modal" style="display: none;">
+            <div class="invoice-modal-content">
+                <span class="close-invoice-modal">&times;</span>
+                <h2>Invoice List</h2>
+                <div id="invoiceListContainer" class="invoice-list"></div>
+            </div>
+        </div>
+
+        <form id="invoiceForm" class="invoice-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="invoiceNo">Invoice No. *</label>
+                    <input type="text" id="invoiceNo" required>
+                </div>
+            </div>
+
+            <h3>From (Your Details)</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="fromName">Company/Person Name *</label>
+                    <input type="text" id="fromName" value="Bluemoon Production" required>
+                </div>
+                <div class="form-group">
+                    <label for="fromPhone">Mobile No. *</label>
+                    <input type="tel" id="fromPhone" value="+91 7049355284" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="fromEmail">Email *</label>
+                    <input type="email" id="fromEmail" value="bluemoonproduction2023@gmail.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="fromAddress">Address *</label>
+                    <input type="text" id="fromAddress" value="Vijay Nagar, Indore M.P." required>
+                </div>
+            </div>
+
+            <h3>To (Client Details)</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="toName">Company/Person Name *</label>
+                    <input type="text" id="toName" required>
+                </div>
+                <div class="form-group">
+                    <label for="toPhone">Mobile No. *</label>
+                    <input type="tel" id="toPhone" >
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="toEmail">Email *</label>
+                    <input type="email" id="toEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="toAddress">Address *</label>
+                    <input type="text" id="toAddress">
+                </div>
+            </div>
+
+            <h3>Invoice Details</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="invoiceDate">Invoice Date *</label>
+                    <input type="date" id="invoiceDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="terms">Terms</label>
+                    <input type="text" id="terms" placeholder="e.g., Net 30">
+                </div>
+                <div class="form-group">
+                    <label for="dueDate">Due Date *</label>
+                    <input type="date" id="dueDate" required>
+                </div>
+            </div>
+
+            <h3>Item Details</h3>
+            <table class="items-table" id="itemsTable">
+                <thead>
+                    <tr>
+                        <th>Sl.No.</th>
+                        <th>Item & Description</th>
+                        <th>Qty</th>
+                        <th>Amount</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="itemsBody">
+                    <tr class="item-row">
+                        <td>1</td>
+                        <td><input type="text" class="item-desc" placeholder="Item description" required></td>
+                        <td><input type="number" class="item-qty" value="1" min="1" required></td>
+                        <td><input type="number" class="item-amount" placeholder="0.00" step="0.01" required></td>
+                        <td><button type="button" class="remove-item" onclick="removeItem(this)">Remove</button></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button type="button" class="add-item-btn" onclick="addItem()">Add Item</button>
+
+            <div class="invoice-totals">
+                <div class="total-row">
+                    <label>Sub Total:</label>
+                    <span id="subTotal">0.00</span>
+                </div>
+                <div class="total-row">
+                    <label>Total:</label>
+                    <span id="total">0.00</span>
+                </div>
+                <div class="form-group">
+                    <label for="advancePayment">Advance Payment:</label>
+                    <input type="number" id="advancePayment" value="0" step="0.01">
+                </div>
+                <div class="total-row">
+                    <label>Balance Due:</label>
+                    <span id="balanceDue">0.00</span>
+                </div>
+                <div class="total-row">
+                    <label>Total in Words:</label>
+                    <span id="totalWords"></span>
+                </div>
+            </div>
+
+            <h3>Payment Details</h3>
+            <div class="form-group">
+                <label for="paymentMethod">Payment Method *</label>
+                <select id="paymentMethod" required>
+                    <option value="">Select Payment Method</option>
+                    <option value="bank">Bank Details</option>
+                    <option value="upi">UPI</option>
+                    <option value="both">Both</option>
+                </select>
+            </div>
+
+            <div id="bankDetails" style="display: none;">
+                <h4>Bank Details</h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="accountHolder">Account Holder Name</label>
+                        <input type="text" id="accountHolder">
+                    </div>
+                    <div class="form-group">
+                        <label for="bankName">Bank Name</label>
+                        <input type="text" id="bankName">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="accountNumber">Account Number</label>
+                        <input type="text" id="accountNumber">
+                    </div>
+                    <div class="form-group">
+                        <label for="accountType">Account Type</label>
+                        <input type="text" id="accountType" placeholder="Savings/Current">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="ifscCode">IFSC Code</label>
+                        <input type="text" id="ifscCode">
+                    </div>
+                    <div class="form-group">
+                        <label for="branch">Branch</label>
+                        <input type="text" id="branch">
+                    </div>
+                    <div class="form-group">
+                        <label for="swiftCode">SWIFT Code</label>
+                        <input type="text" id="swiftCode">
+                    </div>
+                </div>
+            </div>
+
+            <div id="upiDetails" style="display: none;">
+                <h4>UPI Details</h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="upiId">UPI ID *</label>
+                        <input type="text" id="upiId" placeholder="yourname@upi" value="bluemoonproduction@ybl">
+                    </div>
+                    <div class="form-group">
+                        <label for="upiName">Name</label>
+                        <input type="text" id="upiName" value="Bluemoon Production">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="termsConditions">Terms & Conditions</label>
+                <textarea id="termsConditions" rows="4" placeholder="Enter terms and conditions"></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn">Generate Invoice</button>
+        </form>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/theme.js"></script>
+    <script src="../js/invoice.js"></script>
+    <script src="../js/animations.js"></script>
+</body>
+</html>

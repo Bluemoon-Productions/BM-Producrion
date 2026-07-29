@@ -1,0 +1,318 @@
+.modal-content {
+    position: relative;
+    background: rgba(8, 8, 20, 0.97);
+    backdrop-filter: blur(30px);
+    border: 1px solid rgba(255,255,255,0.08);
+    margin: 5% auto;
+    padding: 40px;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 16px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.8), 0 0 60px rgba(53,36,135,0.2);
+    animation: slideDown 0.3s;
+}
+
+.auth-form h2 {
+    text-align: center;
+    color: #fff;
+    margin-bottom: 30px;
+    font-size: 2rem;
+    background: linear-gradient(135deg, #fff, var(--highlight-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.auth-form .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: rgba(255,255,255,0.7);
+    font-weight: 600;
+}
+
+.auth-form .form-group input {
+    width: 100%;
+    padding: 12px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #fff;
+    transition: all 0.3s;
+}
+
+.auth-form .form-group input:focus {
+    outline: none;
+    border-color: var(--highlight-color);
+    box-shadow: 0 0 20px rgba(53, 36, 135, 0.4);
+}
+
+.auth-switch {
+    text-align: center;
+    margin-top: 20px;
+    color: rgba(255,255,255,0.5);
+}
+
+.close-modal {
+    position: absolute;
+    right: 20px; top: 15px;
+    font-size: 30px;
+    cursor: pointer;
+    color: rgba(255,255,255,0.4);
+    transition: all 0.3s;
+}
+
+.close-modal:hover {
+    color: var(--highlight-color);
+    transform: rotate(90deg);
+}
+
+.auth-submit-btn {
+    width: 100%;
+    background: var(--highlight-color);
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 10px;
+}
+
+.auth-submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.auth-switch {
+    text-align: center;
+    margin-top: 20px;
+    color: #666;
+}
+
+.auth-switch a {
+    color: var(--highlight-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.auth-switch a:hover {
+    text-decoration: underline;
+}
+
+/* Modal Background Animation */
+.modal::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        linear-gradient(45deg, transparent 30%, rgba(53, 36, 135, 0.1) 30%, rgba(53, 36, 135, 0.1) 70%, transparent 70%),
+        linear-gradient(-45deg, transparent 30%, rgba(15, 52, 96, 0.1) 30%, rgba(15, 52, 96, 0.1) 70%, transparent 70%);
+    background-size: 100px 100px;
+    animation: moveBackground 20s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes moveBackground {
+    0% {
+        background-position: 0 0, 0 0;
+    }
+    100% {
+        background-position: 100px 100px, -100px 100px;
+    }
+}
+
+/* Form Input Animation */
+.auth-form .form-group input {
+    position: relative;
+}
+
+.auth-form .form-group {
+    position: relative;
+}
+
+.auth-form .form-group input:focus + label,
+.auth-form .form-group input:not(:placeholder-shown) + label {
+    transform: translateY(-25px);
+    font-size: 0.85rem;
+    color: var(--highlight-color);
+}
+
+/* Error Message */
+.error-message {
+    background: #ffebee;
+    color: #c62828;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 0.9rem;
+    display: none;
+}
+
+.error-message.show {
+    display: block;
+    animation: shake 0.5s;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+/* Success Message */
+.success-message {
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 0.9rem;
+    display: none;
+}
+
+.success-message.show {
+    display: block;
+    animation: fadeIn 0.5s;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    display: none;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto;
+}
+
+.loading-spinner.show {
+    display: block;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.auth-submit-btn.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .modal-content {
+        padding: 20px;
+        margin: 10% auto;
+    }
+
+    .auth-form h2 {
+        font-size: 1.5rem;
+    }
+}
+
+/* Custom Alert/Confirm Modal */
+.custom-modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    animation: fadeIn 0.3s ease;
+}
+
+.custom-modal-content {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    margin: 15% auto;
+    padding: 0;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 450px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideDown 0.4s ease;
+    overflow: hidden;
+}
+
+.custom-modal-header {
+    padding: 30px 30px 20px;
+    text-align: center;
+    color: white;
+}
+
+.custom-modal-icon {
+    font-size: 60px;
+    margin-bottom: 15px;
+    animation: scaleIn 0.5s ease;
+}
+
+.custom-modal-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+    color: white;
+}
+
+.custom-modal-body {
+    background: white;
+    padding: 30px;
+    text-align: center;
+}
+
+.custom-modal-message {
+    font-size: 16px;
+    color: #333;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.custom-modal-footer {
+    background: white;
+    padding: 0 30px 30px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.custom-modal-btn {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 120px;
+}
+
+.custom-modal-btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.custom-modal-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+}
+
+.custom-modal-btn-secondary {
+    background: #f0f0f0;
+    color: #666;
+}
+
+.custom-modal-btn-secondary:hover {
+    background: #e0e0e0;
+    transform: translateY(-2px);
+}
