@@ -128,10 +128,27 @@ function initInvoicePage() {
         return `INV-${y}${m}-${r}`;
     }
 
+    function validatePhone(val) {
+        return /^(?:\+91|0)?[6-9]\d{9}$/.test(val.trim().replace(/\s+/g, ''));
+    }
+
     // ---- Form submit ----
     invoiceForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         e.stopPropagation();
+
+        const fromPhone = document.getElementById('fromPhone').value;
+        const toPhone   = document.getElementById('toPhone').value;
+        if (!validatePhone(fromPhone)) {
+            await customAlert('Enter a valid 10-digit mobile number for "From" (e.g. 9876543210 or +91 9876543210).', 'Invalid Mobile', '📵');
+            document.getElementById('fromPhone').focus();
+            return;
+        }
+        if (!validatePhone(toPhone)) {
+            await customAlert('Enter a valid 10-digit mobile number for "Bill To" (e.g. 9876543210 or +91 9876543210).', 'Invalid Mobile', '📵');
+            document.getElementById('toPhone').focus();
+            return;
+        }
 
         const items = [];
         itemsBody.querySelectorAll('.item-row').forEach((row, i) => {
