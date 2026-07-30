@@ -62,6 +62,16 @@
                 <label for="filterTo">To</label>
                 <input type="date" id="filterTo">
             </div>
+            <div class="date-filter-group">
+                <label for="filterStatus">Status</label>
+                <select id="filterStatus">
+                    <option value="all">All</option>
+                    <option value="Generated">Generated</option>
+                    <option value="Paid">Paid</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Rejected">Rejected</option>
+                </select>
+            </div>
             <button class="filter-apply-btn" onclick="applyDateFilter()">Apply</button>
             <button class="filter-clear-btn" onclick="clearDateFilter()">Clear</button>
         </div>

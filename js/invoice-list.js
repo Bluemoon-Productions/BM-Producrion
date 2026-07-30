@@ -45,14 +45,15 @@ async function loadInvoices() {
 }
 
 function applyDateFilter() {
-    const from = document.getElementById('filterFrom').value;
-    const to   = document.getElementById('filterTo').value;
-    if (!from && !to) { renderInvoices(allInvoices); return; }
+    const from   = document.getElementById('filterFrom').value;
+    const to     = document.getElementById('filterTo').value;
+    const status = document.getElementById('filterStatus').value;
 
     const fromDate = from ? new Date(from) : null;
     const toDate   = to   ? new Date(to + 'T23:59:59') : null;
 
     const filtered = allInvoices.filter(inv => {
+        if (status !== 'all' && (inv.status || '').toLowerCase() !== status.toLowerCase()) return false;
         const d = new Date(inv.timestamp);
         if (fromDate && d < fromDate) return false;
         if (toDate   && d > toDate)   return false;
@@ -62,8 +63,9 @@ function applyDateFilter() {
 }
 
 function clearDateFilter() {
-    document.getElementById('filterFrom').value = '';
-    document.getElementById('filterTo').value   = '';
+    document.getElementById('filterFrom').value  = '';
+    document.getElementById('filterTo').value    = '';
+    document.getElementById('filterStatus').value = 'all';
     renderInvoices(allInvoices);
 }
 
@@ -88,6 +90,7 @@ function displayInvoices(invoices) {
     document.getElementById('invoiceList').innerHTML = invoices.map((invoice, index) => {
         const statusColor = invoice.status === 'Paid' ? '#28a745' : invoice.status === 'Rejected' ? '#e94560' : '#ffc107';
         const safeAmt = safeAmount(invoice.totalAmount);
+        const safeAdv = safeAmount(invoice.advancePayment);
         return `
             <div class="invoice-card gsap-3d-float" data-gsap="hoverLift">
                 <div class="invoice-number">#${invoice.invoiceNo}</div>
@@ -97,7 +100,8 @@ function displayInvoices(invoices) {
                     <div><i class="fas fa-calendar"></i> ${new Date(invoice.timestamp).toLocaleDateString()}</div>
                     <div><i class="fas fa-tag"></i> <span style="color: ${statusColor}"> ${invoice.status}</span></div>
                 </div>
-                <div class="invoice-amount">₹${safeAmt.toLocaleString('en-IN')}</div>
+                <div class="invoice-amount">₹${safeAdv.toLocaleString('en-IN')} <span class="amt-divider">/</span> ₹${safeAmt.toLocaleString('en-IN')}</div>
+                <div class="invoice-amount-label">Advance / Total</div>
                 <div class="invoice-actions">
                     <button class="action-btn preview-btn" onclick="previewInvoice('${invoice.pdfUrl}')">
                         👁️ Preview
@@ -214,20 +218,19 @@ async function shareInvoice(pdfUrl, invoiceNo) {
 }
 
 async function deleteInvoice(invoiceNo) {
-    if (confirm('Delete this invoice? This cannot be undone.')) {
-        try {
-            const response = await fetch(CONFIG.SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: CONFIG.ACTIONS.DELETE_INVOICE, invoiceNo })
-            });
-            const result = await response.json();
-            if (result.success) {
-                loadInvoices();
-                customAlert('Invoice deleted successfully.', 'Deleted', '🗑️');
-            }
-        } catch (e) {
-            customAlert('Error deleting invoice.', 'Error', '✕');
+    if (!await customConfirm('This invoice will be hidden from the list but kept in the sheet.', 'Delete Invoice?', '🗑️')) return;
+    try {
+        const response = await fetch(CONFIG.SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: CONFIG.ACTIONS.DELETE_INVOICE, invoiceNo })
+        });
+        const result = await response.json();
+        if (result.success) {
+            loadInvoices();
+            customAlert('Invoice deleted successfully.', 'Deleted', '🗑️');
         }
+    } catch (e) {
+        customAlert('Error deleting invoice.', 'Error', '✕');
     }
 }
 

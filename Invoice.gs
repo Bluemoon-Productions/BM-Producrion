@@ -57,6 +57,7 @@ function getInvoices(data) {
     const invoices = [];
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
+      if ((row[12] || '').toString().toLowerCase() === 'deleted') continue;
       invoices.push({
         invoiceNo: row[0],
         timestamp: row[1],
@@ -64,6 +65,7 @@ function getInvoices(data) {
         customerEmail: row[3],
         customerPhone: row[4],
         totalAmount: row[10],
+        advancePayment: row[8],
         status: row[12],
         pdfUrl: row[13],
         remark: row[16] || '',
@@ -132,8 +134,8 @@ function deleteInvoice(data) {
     const rows = sheet.getDataRange().getValues();
     for (let i = 1; i < rows.length; i++) {
       if (rows[i][0] === data.invoiceNo) {
-        sheet.deleteRow(i + 1);
-        return { success: true, message: 'Invoice deleted successfully' };
+        sheet.getRange(i + 1, 13).setValue('Deleted');
+        return { success: true, message: 'Invoice marked as deleted' };
       }
     }
     return { success: false, error: 'Invoice not found' };
