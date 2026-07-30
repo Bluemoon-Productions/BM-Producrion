@@ -721,7 +721,3 @@ All rights reserved. This project is proprietary software for Bluemoon Productio
 **Built with ❤️ for Bluemoon Production**
 *Professional. Responsive. Feature-Complete.*
 
----
-
-> **Quick Start:** Open `index.html` in a browser to view the site.
-

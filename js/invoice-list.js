@@ -49,7 +49,7 @@ async function loadInvoices() {
 // Display invoices in 3D cards
 function displayInvoices(invoices) {
     document.getElementById('invoiceList').innerHTML = invoices.map((invoice, index) => {
-        const statusColor = invoice.status === 'Paid' ? '#28a745' : '#ffc107';
+        const statusColor = invoice.status === 'Paid' ? '#28a745' : invoice.status === 'Rejected' ? '#e94560' : '#ffc107';
         const amtRaw = parseFloat(String(invoice.totalAmount || "0").replace(/,/g, '').replace(/₹/g, ''));
         const safeAmount = isNaN(amtRaw) ? 0 : amtRaw;
         return `
@@ -71,6 +71,9 @@ function displayInvoices(invoices) {
                     </button>
                     <button class="action-btn delete-btn" onclick="deleteInvoice('${invoice.invoiceNo}')">
                         🗑️ Delete
+                    </button>
+                    <button class="action-btn update-btn" onclick="openStatusModal('${invoice.invoiceNo}', '${invoice.status}', `${invoice.remark || ''}`)">
+                        ✏️ Update
                     </button>
                 </div>
             </div>
@@ -168,30 +171,79 @@ async function deleteInvoice(invoiceNo) {
 // Auto-refresh every 30 seconds
 setInterval(loadInvoices, 30000);
 
-// Custom alert (reuse from utils)
-if (!window.customAlert) {
-    window.customAlert = async (message, title = 'Info', icon = 'ℹ️', showConfirm = false) => {
-        return new Promise((resolve) => {
-            const modal = document.createElement('div');
-            modal.className = 'custom-modal';
-            modal.innerHTML = `
-                <div class="custom-modal-content">
-                    <div class="custom-modal-header">
-                        <div class="custom-modal-icon">${icon}</div>
-                        <h2 class="custom-modal-title">${title}</h2>
-                    </div>
-                    <div class="custom-modal-body">
-                        <p class="custom-modal-message">${message}</p>
-                    </div>
-                    <div class="custom-modal-footer">
-                        <button class="custom-modal-btn custom-modal-btn-primary" onclick="this.closest('.custom-modal').remove(); resolve();">
-                            OK
-                        </button>
-                        ${showConfirm ? '<button class="custom-modal-btn custom-modal-btn-secondary" onclick="this.closest(\'.custom-modal\').remove(); resolve(true);">Confirm</button>' : ''}
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
+// Open status update modal
+function openStatusModal(invoiceNo, currentStatus, currentRemark) {
+    const existing = document.getElementById('statusUpdateModal');
+    if (existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'statusUpdateModal';
+    modal.className = 'invoice-modal';
+    modal.style.display = 'block';
+    modal.innerHTML = `
+        <div class="invoice-modal-content status-modal-content">
+            <span class="close-invoice-modal" onclick="document.getElementById('statusUpdateModal').remove()">&times;</span>
+            <h2>✏️ Update Invoice Status</h2>
+            <p class="status-invoice-no">Invoice: <strong>#${invoiceNo}</strong></p>
+
+            <div class="status-options">
+                <button class="status-opt-btn ${currentStatus === 'Paid' ? 'active' : ''} paid" data-status="Paid">✅ Paid</button>
+                <button class="status-opt-btn ${currentStatus === 'Pending' ? 'active' : ''} pending" data-status="Pending">⏳ Pending</button>
+                <button class="status-opt-btn ${currentStatus === 'Rejected' ? 'active' : ''} rejected" data-status="Rejected">❌ Rejected</button>
+            </div>
+
+            <div id="remarkSection" style="display: none; margin-top: 18px;">
+                <label class="remark-label">Remark</label>
+                <textarea id="statusRemark" class="status-remark-input" placeholder="Enter remark..." rows="3">${currentRemark}</textarea>
+            </div>
+
+            <button class="status-done-btn" id="statusDoneBtn" onclick="submitStatusUpdate('${invoiceNo}')">Done</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    // Show remark for Pending and Rejected by default if already selected
+    let selected = currentStatus;
+    const remarkSection = modal.querySelector('#remarkSection');
+    if (selected === 'Pending' || selected === 'Rejected') remarkSection.style.display = 'block';
+
+    modal.querySelectorAll('.status-opt-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            modal.querySelectorAll('.status-opt-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selected = btn.dataset.status;
+            remarkSection.style.display = (selected === 'Pending' || selected === 'Rejected') ? 'block' : 'none';
         });
-    };
+    });
+
+    modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
 }
+
+async function submitStatusUpdate(invoiceNo) {
+    const modal = document.getElementById('statusUpdateModal');
+    const activeBtn = modal.querySelector('.status-opt-btn.active');
+    if (!activeBtn) { customAlert('Please select a status.', 'Warning', '⚠️'); return; }
+
+    const status = activeBtn.dataset.status;
+    const remark = modal.querySelector('#statusRemark')?.value.trim() || '';
+
+    try {
+        const response = await fetch(CONFIG.SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify({ action: CONFIG.ACTIONS.UPDATE_STATUS, invoiceNo, status, remark })
+        });
+        const result = await response.json();
+        if (result.success) {
+            modal.remove();
+            await loadInvoices();
+            customAlert('Status updated successfully!', 'Updated', '✅');
+        } else {
+            customAlert('Error: ' + result.error, 'Error', '✕');
+        }
+    } catch (e) {
+        customAlert('Error updating status.', 'Error', '✕');
+    }
+}
+
+// customAlert is provided by utils.js which is loaded before this script

@@ -7,7 +7,6 @@ body {
     padding: 20px;
     font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
     color: rgba(255,255,255,0.85);
-    cursor: none;
     min-height: 100vh;
 }
 
@@ -819,4 +818,97 @@ body {
     color: #5dde7a;
     margin: 20px 0;
     text-shadow: 0 0 15px rgba(93, 222, 122, 0.3);
+}
+
+/* ---- UPDATE STATUS BUTTON ---- */
+.update-btn { background: rgba(53,36,135,0.2); color: #9b6dff; border: 1px solid rgba(53,36,135,0.4); }
+.update-btn:hover { background: rgba(53,36,135,0.4); transform: translateY(-2px); }
+
+/* ---- STATUS MODAL ---- */
+.status-modal-content {
+    max-width: 460px;
+}
+
+.status-invoice-no {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.9rem;
+    margin: -10px 0 20px;
+}
+
+.status-options {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.status-opt-btn {
+    flex: 1;
+    padding: 12px 8px;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.25s;
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.6);
+}
+
+.status-opt-btn.paid   { border-color: rgba(40,167,69,0.3); }
+.status-opt-btn.pending { border-color: rgba(255,193,7,0.3); }
+.status-opt-btn.rejected { border-color: rgba(233,69,96,0.3); }
+
+.status-opt-btn.paid.active   { background: rgba(40,167,69,0.25); color: #5dde7a; border-color: #28a745; box-shadow: 0 0 14px rgba(40,167,69,0.3); }
+.status-opt-btn.pending.active { background: rgba(255,193,7,0.2); color: #ffd54f; border-color: #ffc107; box-shadow: 0 0 14px rgba(255,193,7,0.3); }
+.status-opt-btn.rejected.active { background: rgba(233,69,96,0.2); color: #ff6b7a; border-color: #e94560; box-shadow: 0 0 14px rgba(233,69,96,0.3); }
+
+.remark-label {
+    display: block;
+    color: rgba(255,255,255,0.5);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.status-remark-input {
+    width: 100%;
+    padding: 11px 14px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.95rem;
+    resize: vertical;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.status-remark-input:focus {
+    outline: none;
+    border-color: var(--highlight-color);
+    box-shadow: 0 0 16px rgba(53,36,135,0.35);
+}
+
+.status-done-btn {
+    width: 100%;
+    margin-top: 20px;
+    padding: 13px;
+    background: linear-gradient(135deg, var(--highlight-color), #6a3de8);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.status-done-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(53,36,135,0.5);
 }

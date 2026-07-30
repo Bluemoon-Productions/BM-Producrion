@@ -39,6 +39,12 @@ function doPost(e) {
       case 'getInvoiceDetails':
         result = getInvoiceDetails(data);
         break;
+      case 'deleteInvoice':
+        result = deleteInvoice(data);
+        break;
+      case 'updateInvoiceStatus':
+        result = updateInvoiceStatus(data);
+        break;
       default:
         result = { success: false, error: 'Invalid action' };
     }
@@ -499,12 +505,52 @@ function getInvoices(data) {
         totalAmount: row[10],
         status: row[12],
         pdfUrl: row[13],
+        remark: row[16] || '',
         rowIndex: i + 1
       });
     }
     
     // Return in reverse order (newest first)
     return { success: true, invoices: invoices.reverse() };
+  } catch (error) {
+    return { success: false, error: error.toString() };
+  }
+}
+
+// Update Invoice Status
+function updateInvoiceStatus(data) {
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const sheet = ss.getSheetByName(SHEETS.INVOICE);
+    if (!sheet) return { success: false, error: 'Invoice sheet not found' };
+    const dataRange = sheet.getDataRange().getValues();
+    for (let i = 1; i < dataRange.length; i++) {
+      if (dataRange[i][0] === data.invoiceNo) {
+        sheet.getRange(i + 1, 13).setValue(data.status);   // Column M
+        sheet.getRange(i + 1, 17).setValue(data.remark || ''); // Column Q
+        return { success: true, message: 'Status updated successfully' };
+      }
+    }
+    return { success: false, error: 'Invoice not found' };
+  } catch (error) {
+    return { success: false, error: error.toString() };
+  }
+}
+
+// Delete Invoice
+function deleteInvoice(data) {
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const sheet = ss.getSheetByName(SHEETS.INVOICE);
+    if (!sheet) return { success: false, error: 'Invoice sheet not found' };
+    const dataRange = sheet.getDataRange().getValues();
+    for (let i = 1; i < dataRange.length; i++) {
+      if (dataRange[i][0] === data.invoiceNo) {
+        sheet.deleteRow(i + 1);
+        return { success: true, message: 'Invoice deleted successfully' };
+      }
+    }
+    return { success: false, error: 'Invoice not found' };
   } catch (error) {
     return { success: false, error: error.toString() };
   }

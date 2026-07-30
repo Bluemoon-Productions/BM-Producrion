@@ -20,7 +20,6 @@ body {
     color: var(--text-dark);
     overflow-x: hidden;
     background: #0a0a14;
-    cursor: none;
 }
 
 .container {

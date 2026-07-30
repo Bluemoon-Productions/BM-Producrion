@@ -64,7 +64,9 @@ function initThreeJS() {
 
     // GSAP scroll triggers prep
     gsap = window.gsap;
-    gsap.registerPlugin(window.ScrollTrigger);
+    if (gsap && window.ScrollTrigger) {
+        gsap.registerPlugin(window.ScrollTrigger);
+    }
 
     animate();
 }

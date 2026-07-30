@@ -3,61 +3,50 @@ const hamburger = document.getElementById('hamburger');
 const navMenu = document.getElementById('navMenu');
 const navbar = document.getElementById('navbar');
 
-hamburger.addEventListener('click', () => {
-    hamburger.classList.toggle('active');
-    navMenu.classList.toggle('active');
-});
-
-// Close menu when clicking on a link
-document.querySelectorAll('.nav-link').forEach(link => {
-    link.addEventListener('click', () => {
-        hamburger.classList.remove('active');
-        navMenu.classList.remove('active');
+if (hamburger && navMenu) {
+    hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('active');
+        navMenu.classList.toggle('active');
     });
-});
+
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+        });
+    });
+}
 
 // Navbar scroll effect
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-        navbar.classList.add('scrolled');
-    } else {
-        navbar.classList.remove('scrolled');
-    }
-});
+if (navbar) {
+    window.addEventListener('scroll', () => {
+        navbar.classList.toggle('scrolled', window.scrollY > 50);
+    });
+}
 
 // Active nav link on scroll
 const sections = document.querySelectorAll('section');
 const navLinks = document.querySelectorAll('.nav-link');
 
-window.addEventListener('scroll', () => {
-    let current = '';
-    sections.forEach(section => {
-        const sectionTop = section.offsetTop;
-        const sectionHeight = section.clientHeight;
-        if (scrollY >= sectionTop - 100) {
-            current = section.getAttribute('id');
-        }
+if (navLinks.length) {
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+            if (scrollY >= section.offsetTop - 100) current = section.getAttribute('id');
+        });
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === `#${current}`) link.classList.add('active');
+        });
     });
-
-    navLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href') === `#${current}`) {
-            link.classList.add('active');
-        }
-    });
-});
+}
 
 // Smooth scrolling
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
         const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
 });
 
@@ -68,84 +57,59 @@ const dotsContainer = document.querySelector('.slider-dots');
 const sliderContainer = document.querySelector('.slider-container');
 let autoSlideInterval;
 
-// Create dots
-slides.forEach((_, index) => {
-    const dot = document.createElement('div');
-    dot.classList.add('dot');
-    if (index === 0) dot.classList.add('active');
-    dot.addEventListener('click', () => goToSlide(index));
-    dotsContainer.appendChild(dot);
-});
+if (slides.length && dotsContainer) {
+    slides.forEach((_, index) => {
+        const dot = document.createElement('div');
+        dot.classList.add('dot');
+        if (index === 0) dot.classList.add('active');
+        dot.addEventListener('click', () => goToSlide(index));
+        dotsContainer.appendChild(dot);
+    });
+}
 
 const dots = document.querySelectorAll('.dot');
 
 function showSlide(n) {
+    if (!slides.length) return;
     slides.forEach(slide => slide.classList.remove('active'));
     dots.forEach(dot => dot.classList.remove('active'));
-    
     currentSlide = (n + slides.length) % slides.length;
-    
     slides[currentSlide].classList.add('active');
-    dots[currentSlide].classList.add('active');
-    
-    // Animate wave bars on slide change
+    if (dots[currentSlide]) dots[currentSlide].classList.add('active');
     if (window.animateWaveBarsOnSlide) window.animateWaveBarsOnSlide();
 }
 
-function changeSlide(n) {
-    showSlide(currentSlide + n);
-}
+function changeSlide(n) { showSlide(currentSlide + n); }
+function goToSlide(n) { showSlide(n); }
 
-function goToSlide(n) {
-    showSlide(n);
-}
-
-// Auto slide function
 function startAutoSlide() {
-    autoSlideInterval = setInterval(() => {
-        changeSlide(1);
-    }, 5000);
+    autoSlideInterval = setInterval(() => changeSlide(1), 5000);
 }
 
-// Stop auto slide
 function stopAutoSlide() {
     clearInterval(autoSlideInterval);
 }
 
-// Start auto slide
-startAutoSlide();
-
-// Pause on hover (desktop only)
-if (window.innerWidth > 768) {
-    sliderContainer.addEventListener('mouseenter', stopAutoSlide);
-    sliderContainer.addEventListener('mouseleave', startAutoSlide);
-}
-
-// Touch swipe support for mobile slider
-let touchStartX = 0;
-let touchEndX = 0;
-
-sliderContainer.addEventListener('touchstart', e => {
-    touchStartX = e.changedTouches[0].screenX;
-}, {passive: true});
-
-sliderContainer.addEventListener('touchend', e => {
-    touchEndX = e.changedTouches[0].screenX;
-    handleSwipe();
-}, {passive: true});
-
-function handleSwipe() {
-    const swipeThreshold = 50;
-    if (touchEndX < touchStartX - swipeThreshold) {
-        // Swipe left (next)
-        stopAutoSlide();
-        changeSlide(1);
-        startAutoSlide();
-    } else if (touchEndX > touchStartX + swipeThreshold) {
-        // Swipe right (prev)
-        stopAutoSlide();
-        changeSlide(-1);
-        startAutoSlide();
+if (slides.length) {
+    startAutoSlide();
+    if (sliderContainer) {
+        if (window.innerWidth > 768) {
+            sliderContainer.addEventListener('mouseenter', stopAutoSlide);
+            sliderContainer.addEventListener('mouseleave', startAutoSlide);
+        }
+        let touchStartX = 0, touchEndX = 0;
+        sliderContainer.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+        sliderContainer.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            const diff = touchStartX - touchEndX;
+            if (Math.abs(diff) > 50) {
+                stopAutoSlide();
+                changeSlide(diff > 0 ? 1 : -1);
+                startAutoSlide();
+            }
+        }, { passive: true });
     }
 }
 
@@ -155,9 +119,7 @@ const carouselItems = document.querySelectorAll('.carousel-item');
 
 function showCarouselItem(n) {
     carouselItems.forEach(item => item.classList.remove('active'));
-    
     currentCarouselItem = (n + carouselItems.length) % carouselItems.length;
-    
     carouselItems[currentCarouselItem].classList.add('active');
 }
 
@@ -168,37 +130,34 @@ function changeCarousel(n) {
 // Contact Form Submission
 const contactForm = document.getElementById('contactForm');
 
-contactForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const formData = {
-        action: CONFIG.ACTIONS.CONTACT,
-        name: document.getElementById('contactName').value,
-        stageName: document.getElementById('contactStageName').value,
-        instagram: document.getElementById('contactInstagram').value,
-        email: document.getElementById('contactEmail').value,
-        phone: document.getElementById('contactPhone').value,
-        message: document.getElementById('contactMessage').value
-    };
-    
-    try {
-        const response = await fetch(CONFIG.SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData)
-        });
-        
-        alert('Thank you for contacting us! We will get back to you soon.');
+if (contactForm) {
+    contactForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = {
+            action: CONFIG.ACTIONS.CONTACT,
+            name: document.getElementById('contactName').value,
+            stageName: document.getElementById('contactStageName').value,
+            instagram: document.getElementById('contactInstagram').value,
+            email: document.getElementById('contactEmail').value,
+            phone: document.getElementById('contactPhone').value,
+            message: document.getElementById('contactMessage').value
+        };
+
+        try {
+            await fetch(CONFIG.SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+        } catch (error) {
+            console.error('Error:', error);
+        }
+        await customAlert('Thank you for contacting us! We will get back to you soon.', 'Success', '✓');
         contactForm.reset();
-    } catch (error) {
-        console.error('Error:', error);
-        customAlert('Message sent successfully! We will contact you soon.', 'Success', '✓');
-        contactForm.reset();
-    }
-});
+    });
+}
 
 // Check if user is logged in on page load
 window.addEventListener('DOMContentLoaded', () => {
@@ -214,7 +173,6 @@ window.addEventListener('DOMContentLoaded', () => {
 window.addEventListener('resize', () => {
     const user = JSON.parse(localStorage.getItem('user'));
     if (user) {
-        // If logged in, ensure mobile profile is shown on mobile, hidden on desktop
         const mobileProfile = document.querySelector('.mobile-profile');
         if (window.innerWidth <= 768 && !mobileProfile) {
             addMobileProfile(user);
@@ -222,7 +180,6 @@ window.addEventListener('resize', () => {
             mobileProfile.remove();
         }
     } else {
-        // If logged out, ensure mobile login is shown on mobile, hidden on desktop
         const mobileLogin = document.querySelector('.mobile-login');
         if (window.innerWidth <= 768 && !mobileLogin) {
             showMobileLogin();
@@ -233,25 +190,27 @@ window.addEventListener('resize', () => {
 });
 
 function showUserProfile(user) {
-    document.getElementById('loginBtn').style.display = 'none';
-    document.getElementById('userProfile').style.display = 'block';
-    
-    // Show invoice menu only if role is admin (case-insensitive)
+    const loginBtn = document.getElementById('loginBtn');
+    const userProfile = document.getElementById('userProfile');
+    if (loginBtn) loginBtn.style.display = 'none';
+    if (userProfile) userProfile.style.display = 'block';
+
     if (user.role && user.role.toLowerCase() === 'admin') {
         document.body.classList.add('admin-view');
     } else {
         document.body.classList.remove('admin-view');
     }
-    
-    document.getElementById('profileName').textContent = user.fullName;
-    document.getElementById('profileEmail').textContent = user.email;
-    document.getElementById('profileStage').textContent = user.stageName ? `Stage: ${user.stageName}` : '';
-    
-    // Remove mobile login and add mobile profile
+
+    const profileName = document.getElementById('profileName');
+    const profileEmail = document.getElementById('profileEmail');
+    const profileStage = document.getElementById('profileStage');
+    if (profileName) profileName.textContent = user.fullName;
+    if (profileEmail) profileEmail.textContent = user.email;
+    if (profileStage) profileStage.textContent = user.stageName ? `Stage: ${user.stageName}` : '';
+
     removeMobileLogin();
     addMobileProfile(user);
-    
-    // Initialize theme in profile dropdown
+
     if (window.themeManager) {
         setTimeout(() => {
             window.themeManager.addThemeToProfile();
@@ -261,19 +220,13 @@ function showUserProfile(user) {
 }
 
 function addMobileProfile(user) {
-    // Remove existing mobile profile if any
     const existingMobile = document.querySelector('.mobile-profile');
     if (existingMobile) existingMobile.remove();
-    
-    // Only add mobile profile on mobile screens
-    if (window.innerWidth <= 768) {
-        // Get current theme
+
+    if (window.innerWidth <= 768 && navMenu) {
         const currentTheme = localStorage.getItem('selectedTheme') || 'purple';
-        
-        // Check if user is admin
         const isAdmin = user.role && user.role.toLowerCase() === 'admin';
-        
-        // Create theme section HTML (only for admin)
+
         const themeSection = isAdmin ? `
             <div class="mobile-theme-section">
                 <h4>🎨 Select Theme</h4>
@@ -309,8 +262,7 @@ function addMobileProfile(user) {
                 </div>
             </div>
         ` : '';
-        
-        // Create mobile profile element
+
         const mobileProfile = document.createElement('li');
         mobileProfile.className = 'mobile-profile';
         mobileProfile.innerHTML = `
@@ -322,83 +274,63 @@ function addMobileProfile(user) {
             ${themeSection}
             <button class="logout-btn" id="mobileLogoutBtn">Logout</button>
         `;
-        
-        // Add to nav menu
+
         navMenu.appendChild(mobileProfile);
-        
-        // Add theme selection handlers (only for admin)
+
         if (isAdmin) {
             let selectedTheme = currentTheme;
-            
+
             mobileProfile.querySelectorAll('.mobile-theme-item').forEach(item => {
                 item.addEventListener('click', () => {
                     selectedTheme = item.dataset.theme;
-                    
-                    mobileProfile.querySelectorAll('.mobile-theme-item').forEach(i => {
-                        i.classList.remove('active');
-                    });
+                    mobileProfile.querySelectorAll('.mobile-theme-item').forEach(i => i.classList.remove('active'));
                     item.classList.add('active');
                 });
             });
-            
+
             document.getElementById('mobileThemeApplyBtn').addEventListener('click', async () => {
                 if (window.themeManager) {
                     window.themeManager.switchTheme(selectedTheme);
                     await customAlert('Theme applied successfully!', 'Success', '🎨');
                 }
             });
-            
+
             document.getElementById('mobileThemeCancelBtn').addEventListener('click', () => {
-                // Reset to current theme
                 selectedTheme = currentTheme;
                 mobileProfile.querySelectorAll('.mobile-theme-item').forEach(i => {
                     i.classList.remove('active');
-                    if (i.dataset.theme === currentTheme) {
-                        i.classList.add('active');
-                    }
+                    if (i.dataset.theme === currentTheme) i.classList.add('active');
                 });
             });
         }
-        
-        // Add logout handler
+
         document.getElementById('mobileLogoutBtn').addEventListener('click', async () => {
             localStorage.removeItem('user');
             hideUserProfile();
-            hamburger.classList.remove('active');
-            navMenu.classList.remove('active');
+            if (hamburger) hamburger.classList.remove('active');
+            if (navMenu) navMenu.classList.remove('active');
             await customAlert('Logged out successfully!', 'Success', '✓');
         });
     }
 }
 
 function showMobileLogin() {
-    // Remove existing mobile login if any
     const existingLogin = document.querySelector('.mobile-login');
     if (existingLogin) existingLogin.remove();
-    
-    // Only add mobile login on mobile screens
-    if (window.innerWidth <= 768) {
-        // Create mobile login element
+
+    if (window.innerWidth <= 768 && navMenu) {
         const mobileLogin = document.createElement('li');
         mobileLogin.className = 'mobile-login';
-        mobileLogin.innerHTML = `
-            <button class="login-btn" id="mobileLoginBtn">Login</button>
-        `;
-        
-        // Add to nav menu
+        mobileLogin.innerHTML = `<button class="login-btn" id="mobileLoginBtn">Login</button>`;
         navMenu.appendChild(mobileLogin);
-        
-        // Add login handler
+
         document.getElementById('mobileLoginBtn').addEventListener('click', () => {
-            // Access authModal from window (set in auth.js)
             if (window.authModal) {
                 window.authModal.style.display = 'block';
-                if (window.showLoginForm) {
-                    window.showLoginForm();
-                }
+                if (window.showLoginForm) window.showLoginForm();
             }
-            hamburger.classList.remove('active');
-            navMenu.classList.remove('active');
+            if (hamburger) hamburger.classList.remove('active');
+            if (navMenu) navMenu.classList.remove('active');
         });
     }
 }
@@ -409,14 +341,15 @@ function removeMobileLogin() {
 }
 
 function hideUserProfile() {
-    document.getElementById('loginBtn').style.display = 'block';
-    document.getElementById('userProfile').style.display = 'none';
+    const loginBtn = document.getElementById('loginBtn');
+    const userProfile = document.getElementById('userProfile');
+    if (loginBtn) loginBtn.style.display = 'block';
+    if (userProfile) userProfile.style.display = 'none';
     document.body.classList.remove('admin-view');
-    
-    // Remove mobile profile and show mobile login
+
     const mobileProfile = document.querySelector('.mobile-profile');
     if (mobileProfile) mobileProfile.remove();
-    
+
     showMobileLogin();
 }
 
@@ -425,18 +358,12 @@ document.querySelectorAll('.service-card').forEach(card => {
     card.addEventListener('mouseenter', function() {
         this.style.transform = 'translateY(-10px) scale(1.02)';
     });
-    
     card.addEventListener('mouseleave', function() {
         this.style.transform = 'translateY(0) scale(1)';
     });
 });
 
 // Intersection Observer for animations
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -100px 0px'
-};
-
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -444,9 +371,8 @@ const observer = new IntersectionObserver((entries) => {
             entry.target.style.transform = 'translateY(0)';
         }
     });
-}, observerOptions);
+}, { threshold: 0.1, rootMargin: '0px 0px -100px 0px' });
 
-// Observe service cards
 document.querySelectorAll('.service-card').forEach(card => {
     card.style.opacity = '0';
     card.style.transform = 'translateY(30px)';
@@ -458,13 +384,9 @@ document.querySelectorAll('.service-card').forEach(card => {
 const adminSidebar = document.getElementById('adminSidebar');
 if (adminSidebar) {
     adminSidebar.addEventListener('mouseenter', () => {
-        if (window.innerWidth > 768) {
-            adminSidebar.classList.add('expanded');
-        }
+        if (window.innerWidth > 768) adminSidebar.classList.add('expanded');
     });
     adminSidebar.addEventListener('mouseleave', () => {
-        if (window.innerWidth > 768) {
-            adminSidebar.classList.remove('expanded');
-        }
+        if (window.innerWidth > 768) adminSidebar.classList.remove('expanded');
     });
 }
