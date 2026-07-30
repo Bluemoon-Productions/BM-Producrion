@@ -62,6 +62,7 @@ function getInvoices(data) {
         timestamp: row[1],
         customerName: row[2],
         customerEmail: row[3],
+        customerPhone: row[4],
         totalAmount: row[10],
         status: row[12],
         pdfUrl: row[13],

@@ -93,7 +93,7 @@ function displayInvoices(invoices) {
                 <div class="invoice-number">#${invoice.invoiceNo}</div>
                 <div class="invoice-meta">
                     <div><i class="fas fa-user"></i> ${invoice.customerName}</div>
-                    <div><i class="fas fa-phone"></i> ${invoice.contactNo}</div>
+                    <div><i class="fas fa-phone"></i> ${invoice.customerPhone}</div>
                     <div><i class="fas fa-calendar"></i> ${new Date(invoice.timestamp).toLocaleDateString()}</div>
                     <div><i class="fas fa-tag"></i> <span style="color: ${statusColor}"> ${invoice.status}</span></div>
                 </div>
