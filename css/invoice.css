@@ -1004,6 +1004,80 @@ body {
 .update-btn { background: rgba(53,36,135,0.2); color: #9b6dff; border: 1px solid rgba(53,36,135,0.4); }
 .update-btn:hover { background: rgba(53,36,135,0.4); transform: translateY(-2px); }
 
+/* ---- Invoice List Action Buttons ---- */
+.invoice-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.inv-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 10px 8px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+    backdrop-filter: blur(6px);
+}
+
+.inv-btn i { font-size: 0.85rem; }
+
+.inv-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+.inv-btn:active { transform: translateY(0); }
+
+.inv-preview {
+    background: rgba(0,123,255,0.12);
+    color: #5ba8ff;
+    border-color: rgba(0,123,255,0.3);
+}
+.inv-preview:hover { background: rgba(0,123,255,0.28); box-shadow: 0 6px 20px rgba(0,123,255,0.2); }
+
+.inv-share {
+    background: rgba(40,167,69,0.12);
+    color: #5dde7a;
+    border-color: rgba(40,167,69,0.3);
+}
+.inv-share:hover { background: rgba(40,167,69,0.28); box-shadow: 0 6px 20px rgba(40,167,69,0.2); }
+
+.inv-delete {
+    background: rgba(233,69,96,0.12);
+    color: #ff6b8a;
+    border-color: rgba(233,69,96,0.3);
+}
+.inv-delete:hover { background: rgba(233,69,96,0.28); box-shadow: 0 6px 20px rgba(233,69,96,0.2); }
+
+.inv-update {
+    background: rgba(155,109,255,0.12);
+    color: #b48aff;
+    border-color: rgba(155,109,255,0.3);
+}
+.inv-update:hover { background: rgba(155,109,255,0.28); box-shadow: 0 6px 20px rgba(155,109,255,0.2); }
+
+/* Tablet: 4 buttons in a row */
+@media (min-width: 600px) {
+    .invoice-actions { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Mobile: icon only, label hidden */
+@media (max-width: 400px) {
+    .inv-btn span { display: none; }
+    .inv-btn { padding: 11px; }
+    .inv-btn i { font-size: 1rem; }
+}
+
 /* ---- STATUS MODAL ---- */
 .status-modal-content {
     max-width: 460px;
@@ -1073,22 +1147,41 @@ body {
 }
 
 .status-done-btn {
-    width: 100%;
-    margin-top: 20px;
-    padding: 13px;
-    background: linear-gradient(135deg, var(--highlight-color), #6a3de8);
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    font-size: 1rem;
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 700;
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: transform 0.3s, box-shadow 0.3s;
+    display: none;
 }
 
-.status-done-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(53,36,135,0.5);
+.status-modal-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.status-modal-confirm {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.inv-cancel {
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.5);
+    border-color: rgba(255,255,255,0.15);
+}
+.inv-cancel:hover { background: rgba(255,255,255,0.1); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
+
+.inv-done {
+    background: rgba(53,36,135,0.2);
+    color: #b48aff;
+    border-color: rgba(155,109,255,0.4);
+    font-weight: 700;
+}
+.inv-done:hover { background: rgba(53,36,135,0.45); box-shadow: 0 6px 20px rgba(53,36,135,0.35); }
+
+@media (max-width: 360px) {
+    .status-modal-actions .inv-btn span,
+    .status-modal-confirm .inv-btn span { display: none; }
+    .status-modal-actions .inv-btn,
+    .status-modal-confirm .inv-btn { padding: 11px; }
 }

@@ -103,17 +103,14 @@ function displayInvoices(invoices) {
                 <div class="invoice-amount">₹${safeAdv.toLocaleString('en-IN')} <span class="amt-divider">/</span> ₹${safeAmt.toLocaleString('en-IN')}</div>
                 <div class="invoice-amount-label">Advance / Total</div>
                 <div class="invoice-actions">
-                    <button class="action-btn preview-btn" onclick="previewInvoice('${invoice.pdfUrl}')">
-                        👁️ Preview
+                    <button class="inv-btn inv-preview" onclick="previewInvoice('${invoice.pdfUrl}')" title="Preview">
+                        <i class="fas fa-eye"></i><span>Preview</span>
                     </button>
-                    <button class="action-btn share-btn" onclick="shareInvoice('${invoice.pdfUrl}', '${invoice.invoiceNo}')">
-                        📤 Share
+                    <button class="inv-btn inv-share" onclick="shareInvoice('${invoice.pdfUrl}', '${invoice.invoiceNo}')" title="Share">
+                        <i class="fas fa-share-alt"></i><span>Share</span>
                     </button>
-                    <button class="action-btn delete-btn" onclick="deleteInvoice('${invoice.invoiceNo}')">
-                        🗑️ Delete
-                    </button>
-                    <button class="action-btn update-btn" onclick="openStatusModal('${invoice.invoiceNo}', '${invoice.status}', '${invoice.remark || ''}')">
-                        ✏️ Update
+                    <button class="inv-btn inv-update" onclick="openStatusModal('${invoice.invoiceNo}', '${invoice.status}', '${invoice.remark || ''}', '${invoice.pdfUrl}')" title="Update Status">
+                        <i class="fas fa-pen"></i><span>Update</span>
                     </button>
                 </div>
             </div>
@@ -226,6 +223,8 @@ async function deleteInvoice(invoiceNo) {
         });
         const result = await response.json();
         if (result.success) {
+            const m = document.getElementById('statusUpdateModal');
+            if (m) m.remove();
             loadInvoices();
             customAlert('Invoice deleted successfully.', 'Deleted', '🗑️');
         }
@@ -243,7 +242,7 @@ setInterval(async () => {
 }, 30000);
 
 // Open status update modal
-function openStatusModal(invoiceNo, currentStatus, currentRemark) {
+function openStatusModal(invoiceNo, currentStatus, currentRemark, pdfUrl) {
     const existing = document.getElementById('statusUpdateModal');
     if (existing) existing.remove();
 
@@ -258,9 +257,9 @@ function openStatusModal(invoiceNo, currentStatus, currentRemark) {
             <p class="status-invoice-no">Invoice: <strong>#${invoiceNo}</strong></p>
 
             <div class="status-options">
-                <button class="status-opt-btn ${currentStatus === 'Paid' ? 'active' : ''} paid" data-status="Paid">✅ Paid</button>
-                <button class="status-opt-btn ${currentStatus === 'Pending' ? 'active' : ''} pending" data-status="Pending">⏳ Pending</button>
-                <button class="status-opt-btn ${currentStatus === 'Rejected' ? 'active' : ''} rejected" data-status="Rejected">❌ Rejected</button>
+                <button class="status-opt-btn ${currentStatus === 'Paid' ? 'active' : ''} paid" data-status="Paid"><i class="fas fa-check-circle"></i> Paid</button>
+                <button class="status-opt-btn ${currentStatus === 'Pending' ? 'active' : ''} pending" data-status="Pending"><i class="fas fa-clock"></i> Pending</button>
+                <button class="status-opt-btn ${currentStatus === 'Rejected' ? 'active' : ''} rejected" data-status="Rejected"><i class="fas fa-times-circle"></i> Rejected</button>
             </div>
 
             <div id="remarkSection" style="display: none; margin-top: 18px;">
@@ -268,7 +267,22 @@ function openStatusModal(invoiceNo, currentStatus, currentRemark) {
                 <textarea id="statusRemark" class="status-remark-input" placeholder="Enter remark..." rows="3">${currentRemark}</textarea>
             </div>
 
-            <button class="status-done-btn" id="statusDoneBtn" onclick="submitStatusUpdate('${invoiceNo}')">Done</button>
+            <div class="status-modal-actions">
+                <button class="inv-btn inv-preview" onclick="previewInvoice('${pdfUrl}')">
+                    <i class="fas fa-eye"></i><span>Preview</span>
+                </button>
+                <button class="inv-btn inv-delete" onclick="deleteInvoice('${invoiceNo}')">
+                    <i class="fas fa-trash-alt"></i><span>Delete</span>
+                </button>
+            </div>
+            <div class="status-modal-confirm">
+                <button class="inv-btn inv-cancel" onclick="document.getElementById('statusUpdateModal').remove()">
+                    <i class="fas fa-times"></i><span>Cancel</span>
+                </button>
+                <button class="inv-btn inv-done" onclick="submitStatusUpdate('${invoiceNo}')">
+                    <i class="fas fa-check"></i><span>Done</span>
+                </button>
+            </div>
         </div>
     `;
     document.body.appendChild(modal);
