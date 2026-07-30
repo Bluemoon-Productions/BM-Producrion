@@ -53,27 +53,59 @@
             <h1>📋 Invoice List</h1>
             <p>Manage all your invoices</p>
         </div>
+        <div class="date-filter-bar">
+            <div class="date-filter-group">
+                <label for="filterFrom">From</label>
+                <input type="date" id="filterFrom">
+            </div>
+            <div class="date-filter-group">
+                <label for="filterTo">To</label>
+                <input type="date" id="filterTo">
+            </div>
+            <button class="filter-apply-btn" onclick="applyDateFilter()">Apply</button>
+            <button class="filter-clear-btn" onclick="clearDateFilter()">Clear</button>
+        </div>
     </div>
 
 
     <div class="invoice-list-container">
         <!-- Stats Grid -->
+        <!-- Row 1: counts -->
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-number" id="totalInvoices">0</div>
-                <div>Total Invoices</div>
+                <div class="stat-label">Total Invoices</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-number" id="totalAmount">₹0</div>
-                <div>Total Amount</div>
+            <div class="stat-card stat-paid">
+                <div class="stat-number" id="paidCount">0</div>
+                <div class="stat-label">Paid</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-number" id="paidInvoices">0</div>
-                <div>Paid</div>
+            <div class="stat-card stat-pending">
+                <div class="stat-number" id="pendingCount">0</div>
+                <div class="stat-label">Pending</div>
             </div>
+            <div class="stat-card stat-generated">
+                <div class="stat-number" id="generatedCount">0</div>
+                <div class="stat-label">Generated</div>
+            </div>
+        </div>
+        <!-- Row 2: amounts -->
+        <div class="stats-grid stats-grid-amounts">
             <div class="stat-card">
-                <div class="stat-number" id="pendingInvoices">0</div>
-                <div>Pending</div>
+                <div class="stat-number stat-number-sm" id="totalAmount">₹0</div>
+                <div class="stat-label">Total Amount</div>
+            </div>
+            <div class="stat-card stat-paid">
+                <div class="stat-number stat-number-sm" id="paidAmount">₹0</div>
+                <div class="stat-label">Paid Amount</div>
+            </div>
+            <div class="stat-card stat-pending">
+                <div class="stat-number stat-number-sm" id="pendingAmount">₹0</div>
+                <div class="stat-label">Pending Amount</div>
+            </div>
+            <div class="stat-card stat-generated">
+                <div class="stat-number stat-number-sm" id="generatedAmount">₹0</div>
+                <div class="stat-label">Generated Amount</div>
             </div>
         </div>
 
@@ -95,6 +127,7 @@
     <script src="../js/theme.js"></script>
     <script src="../js/three-setup.js"></script>
     <script src="../js/main.js"></script>
+    <script src="../js/animations.js"></script>
     <script>
         // Init 3D scene for list
         document.addEventListener('DOMContentLoaded', () => {
@@ -104,7 +137,6 @@
         });
     </script>
     <script src="../js/invoice-list.js"></script>
-    <script src="../js/animations.js"></script>
 </body>
 
 </html>

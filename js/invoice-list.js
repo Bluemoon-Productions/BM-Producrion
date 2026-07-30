@@ -1,22 +1,17 @@
 // Invoice List Viewer - 3D Enhanced
-// Fetches from Google Apps Script, 3D cards
+
+let allInvoices = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
     const user = JSON.parse(localStorage.getItem('user'));
-    
-    // Redirect non-admins back to home page
     if (!user || !user.role || user.role.toLowerCase() !== 'admin') {
         window.location.href = '../index.html';
         return;
     }
-
-    // Safe to show admin sidebar
     document.body.classList.add('admin-view');
-
     await loadInvoices();
 });
 
-// Load all invoices
 async function loadInvoices() {
     try {
         const response = await fetch(CONFIG.SCRIPT_URL, {
@@ -24,25 +19,67 @@ async function loadInvoices() {
             headers: { 'Content-Type': 'text/plain' },
             body: JSON.stringify({ action: CONFIG.ACTIONS.GET_INVOICES })
         });
-        
         const result = await response.json();
-        
-        if (result.success && result.invoices.length > 0) {
-            displayInvoices(result.invoices);
-            updateStats(result.invoices);
-            document.getElementById('noInvoices').style.display = 'none';
+        console.log('[Invoice] API result:', JSON.stringify(result).slice(0, 500));
+
+        if (result.success && Array.isArray(result.invoices) && result.invoices.length > 0) {
+            allInvoices = result.invoices;
+            console.log('[Invoice] Sample invoice:', result.invoices[0]);
         } else {
-            document.getElementById('noInvoices').style.display = 'block';
-            document.getElementById('invoiceList').innerHTML = '';
-                updateStats([]); // Reset stats to 0
+            allInvoices = [];
         }
+        renderInvoices(allInvoices);
     } catch (error) {
-        console.error('Error:', error);
-            // Only show error text if no invoices rendered yet
-            if (!document.getElementById('invoiceList').innerHTML) {
-                document.getElementById('noInvoices').innerHTML = '<p>Error loading invoices.</p>';
-                document.getElementById('noInvoices').style.display = 'block';
-            }
+        console.error('[Invoice] Load error:', error);
+        // Only show error state if no invoices are currently displayed
+        if (allInvoices.length === 0) {
+            document.getElementById('noInvoices').innerHTML = `
+                <i class="fas fa-inbox" style="font-size:4rem;color:#ccc;margin-bottom:20px"></i>
+                <h2>No Invoices Found</h2>
+                <p>Create your first invoice to get started.</p>
+                <a href="invoice.html" class="generate-new-btn">➕ Create First Invoice</a>`;
+            document.getElementById('noInvoices').style.display = 'block';
+            updateStats([]);
+        }
+    }
+}
+
+function applyDateFilter() {
+    const from = document.getElementById('filterFrom').value;
+    const to   = document.getElementById('filterTo').value;
+    if (!from && !to) { renderInvoices(allInvoices); return; }
+
+    const fromDate = from ? new Date(from) : null;
+    const toDate   = to   ? new Date(to + 'T23:59:59') : null;
+
+    const filtered = allInvoices.filter(inv => {
+        const d = new Date(inv.timestamp);
+        if (fromDate && d < fromDate) return false;
+        if (toDate   && d > toDate)   return false;
+        return true;
+    });
+    renderInvoices(filtered);
+}
+
+function clearDateFilter() {
+    document.getElementById('filterFrom').value = '';
+    document.getElementById('filterTo').value   = '';
+    renderInvoices(allInvoices);
+}
+
+function renderInvoices(invoices) {
+    updateStats(invoices);
+    if (invoices.length > 0) {
+        displayInvoices(invoices);
+        document.getElementById('noInvoices').style.display = 'none';
+    } else {
+        document.getElementById('invoiceList').innerHTML = '';
+        document.getElementById('noInvoices').innerHTML = `
+            <i class="fas fa-inbox" style="font-size:4rem;color:#ccc;margin-bottom:20px"></i>
+            <h2>No Invoices Found</h2>
+            <p>Create your first invoice to get started.</p>
+            <a href="invoice.html" class="generate-new-btn">➕ Create First Invoice</a>`;
+        document.getElementById('noInvoices').style.display = 'block';
     }
 }
 
@@ -50,8 +87,7 @@ async function loadInvoices() {
 function displayInvoices(invoices) {
     document.getElementById('invoiceList').innerHTML = invoices.map((invoice, index) => {
         const statusColor = invoice.status === 'Paid' ? '#28a745' : invoice.status === 'Rejected' ? '#e94560' : '#ffc107';
-        const amtRaw = parseFloat(String(invoice.totalAmount || "0").replace(/,/g, '').replace(/₹/g, ''));
-        const safeAmount = isNaN(amtRaw) ? 0 : amtRaw;
+        const safeAmt = safeAmount(invoice.totalAmount);
         return `
             <div class="invoice-card gsap-3d-float" data-gsap="hoverLift">
                 <div class="invoice-number">#${invoice.invoiceNo}</div>
@@ -61,7 +97,7 @@ function displayInvoices(invoices) {
                     <div><i class="fas fa-calendar"></i> ${new Date(invoice.timestamp).toLocaleDateString()}</div>
                     <div><i class="fas fa-tag"></i> <span style="color: ${statusColor}"> ${invoice.status}</span></div>
                 </div>
-                <div class="invoice-amount">₹${safeAmount.toLocaleString('en-IN')}</div>
+                <div class="invoice-amount">₹${safeAmt.toLocaleString('en-IN')}</div>
                 <div class="invoice-actions">
                     <button class="action-btn preview-btn" onclick="previewInvoice('${invoice.pdfUrl}')">
                         👁️ Preview
@@ -97,20 +133,47 @@ function displayInvoices(invoices) {
     });
 }
 
-// Update dashboard stats
+function safeAmount(val) {
+    if (val === null || val === undefined || val === '') return 0;
+    if (typeof val === 'number') return isNaN(val) ? 0 : val;
+    const n = parseFloat(String(val).replace(/[₹,\s]/g, ''));
+    return isNaN(n) ? 0 : n;
+}
+
+function setStatEl(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+}
+
+// Update dashboard stats — always computed fresh from the passed array
 function updateStats(invoices) {
-    const totalInvoices = invoices.length;
-    const totalAmount = invoices.reduce((sum, inv) => {
-        const amt = parseFloat(String(inv.totalAmount || "0").replace(/,/g, '').replace(/₹/g, ''));
-        return sum + (isNaN(amt) ? 0 : amt);
-    }, 0);
-    const paidInvoices = invoices.filter(inv => inv.status === 'Paid').length;
-    const pendingInvoices = totalInvoices - paidInvoices;
-    
-    document.getElementById('totalInvoices').textContent = totalInvoices;
-    document.getElementById('totalAmount').textContent = `₹${totalAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
-    document.getElementById('paidInvoices').textContent = paidInvoices;
-    document.getElementById('pendingInvoices').textContent = pendingInvoices;
+    let total = 0;
+    let paidCount = 0,    paidAmt = 0;
+    let pendingCount = 0, pendingAmt = 0;
+    let genCount = 0,     genAmt = 0;
+    let totalAmount = 0;
+
+    for (let i = 0; i < invoices.length; i++) {
+        const inv = invoices[i];
+        const amt = safeAmount(inv.totalAmount);
+        const s   = (inv.status || '').trim();
+        total++;
+        totalAmount += amt;
+        if (s === 'Paid')      { paidCount++;    paidAmt    += amt; }
+        if (s === 'Pending')   { pendingCount++; pendingAmt += amt; }
+        if (s === 'Generated') { genCount++;     genAmt     += amt; }
+    }
+
+    const fmt = v => '₹' + v.toLocaleString('en-IN', { maximumFractionDigits: 2 });
+
+    setStatEl('totalInvoices',   total);
+    setStatEl('paidCount',       paidCount);
+    setStatEl('pendingCount',    pendingCount);
+    setStatEl('generatedCount',  genCount);
+    setStatEl('totalAmount',     fmt(totalAmount));
+    setStatEl('paidAmount',      fmt(paidAmt));
+    setStatEl('pendingAmount',   fmt(pendingAmt));
+    setStatEl('generatedAmount', fmt(genAmt));
 }
 
 // Preview, share, delete functions (same as invoice.html)
@@ -168,8 +231,13 @@ async function deleteInvoice(invoiceNo) {
     }
 }
 
-// Auto-refresh every 30 seconds
-setInterval(loadInvoices, 30000);
+// Auto-refresh every 30 seconds (re-applies active filter)
+setInterval(async () => {
+    await loadInvoices();
+    const from = document.getElementById('filterFrom')?.value;
+    const to   = document.getElementById('filterTo')?.value;
+    if (from || to) applyDateFilter();
+}, 30000);
 
 // Open status update modal
 function openStatusModal(invoiceNo, currentStatus, currentRemark) {
