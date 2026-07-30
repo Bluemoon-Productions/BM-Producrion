@@ -72,7 +72,7 @@ function displayInvoices(invoices) {
                     <button class="action-btn delete-btn" onclick="deleteInvoice('${invoice.invoiceNo}')">
                         🗑️ Delete
                     </button>
-                    <button class="action-btn update-btn" onclick="openStatusModal('${invoice.invoiceNo}', '${invoice.status}', `${invoice.remark || ''}`)">
+                    <button class="action-btn update-btn" onclick="openStatusModal('${invoice.invoiceNo}', '${invoice.status}', '${invoice.remark || ''}')">
                         ✏️ Update
                     </button>
                 </div>
