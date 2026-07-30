@@ -240,7 +240,8 @@ function initInvoicePage() {
             if (result.success) {
                 await customAlert(
                     `Invoice generated successfully!<br><strong>Invoice No:</strong> ${invoiceData.invoiceNo}<br>PDF saved to Google Drive.`,
-                    'Success', '✓', result.pdfUrl || null
+                    'Success', '✓', result.pdfUrl || null,
+                    { toName: invoiceData.to.name, invoiceNo: invoiceData.invoiceNo, pdfUrl: result.pdfUrl || '' }
                 );
                 invoiceForm.reset();
                 calculateTotals();

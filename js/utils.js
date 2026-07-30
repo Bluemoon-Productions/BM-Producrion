@@ -1,11 +1,15 @@
 // Custom Alert and Confirm Functions
-function customAlert(message, title = 'Notification', icon = '✓', pdfUrl = null) {
+function customAlert(message, title = 'Notification', icon = '✓', pdfUrl = null, shareData = null) {
     return new Promise((resolve) => {
         const modal = document.createElement('div');
         modal.className = 'custom-modal';
 
         const previewButton = pdfUrl
             ? `<button class="custom-modal-btn custom-modal-btn-secondary" id="_previewBtn">👁️ Preview Invoice</button>`
+            : '';
+
+        const shareButton = shareData
+            ? `<button class="custom-modal-btn custom-modal-btn-secondary" id="_shareBtn">📤 Share Invoice</button>`
             : '';
 
         modal.innerHTML = `
@@ -19,6 +23,7 @@ function customAlert(message, title = 'Notification', icon = '✓', pdfUrl = nul
                 </div>
                 <div class="custom-modal-footer">
                     ${previewButton}
+                    ${shareButton}
                     <button class="custom-modal-btn custom-modal-btn-primary" id="_okBtn">OK</button>
                 </div>
             </div>
@@ -38,6 +43,21 @@ function customAlert(message, title = 'Notification', icon = '✓', pdfUrl = nul
                 else if (pdfUrl.includes('id=')) fileId = pdfUrl.split('id=')[1].split('&')[0];
                 const previewUrl = fileId ? `https://drive.google.com/file/d/${fileId}/preview` : pdfUrl;
                 window.open(previewUrl, '_blank');
+            });
+        }
+
+        if (shareData) {
+            modal.querySelector('#_shareBtn').addEventListener('click', () => {
+                let fileId = '';
+                if (shareData.pdfUrl.includes('/d/'))  fileId = shareData.pdfUrl.split('/d/')[1].split('/')[0];
+                else if (shareData.pdfUrl.includes('id=')) fileId = shareData.pdfUrl.split('id=')[1].split('&')[0];
+                const link = fileId ? `https://drive.google.com/file/d/${fileId}/view` : shareData.pdfUrl;
+                const text = `Hii ${shareData.toName},\nPlease find the invoice here: ${shareData.invoiceNo}\n${link}`;
+                navigator.clipboard.writeText(text).then(() => {
+                    const btn = modal.querySelector('#_shareBtn');
+                    btn.textContent = '✅ Copied!';
+                    setTimeout(() => { btn.innerHTML = '📤 Share Invoice'; }, 2000);
+                });
             });
         }
     });
