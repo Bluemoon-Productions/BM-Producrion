@@ -1,12 +1,17 @@
 // Custom Alert and Confirm Functions
-function customAlert(message, title = 'Notification', icon = '✓', showInvoiceListBtn = false) {
+function customAlert(message, title = 'Notification', icon = '✓', pdfUrl = null, shareData = null) {
     return new Promise((resolve) => {
         const modal = document.createElement('div');
         modal.className = 'custom-modal';
-        
-        const invoiceListButton = showInvoiceListBtn ? 
-            '<button class="custom-modal-btn custom-modal-btn-secondary" onclick="window.location.href=\'#invoice-list\'; this.closest(\'.custom-modal\').remove();">📋 View Invoice List</button>' : '';
-        
+
+        const previewButton = pdfUrl
+            ? `<button class="custom-modal-btn custom-modal-btn-secondary" id="_previewBtn">👁️ Preview Invoice</button>`
+            : '';
+
+        const shareButton = shareData
+            ? `<button class="custom-modal-btn custom-modal-btn-secondary" id="_shareBtn">📤 Share Invoice</button>`
+            : '';
+
         modal.innerHTML = `
             <div class="custom-modal-content">
                 <div class="custom-modal-header">
@@ -17,24 +22,42 @@ function customAlert(message, title = 'Notification', icon = '✓', showInvoiceL
                     <p class="custom-modal-message">${message}</p>
                 </div>
                 <div class="custom-modal-footer">
-                    ${invoiceListButton}
-                    <button class="custom-modal-btn custom-modal-btn-primary" onclick="this.closest('.custom-modal').remove()">OK</button>
+                    ${previewButton}
+                    ${shareButton}
+                    <button class="custom-modal-btn custom-modal-btn-primary" id="_okBtn">OK</button>
                 </div>
             </div>
         `;
         document.body.appendChild(modal);
         modal.style.display = 'block';
-        
-        modal.querySelector('.custom-modal-btn-primary').addEventListener('click', () => {
+
+        modal.querySelector('#_okBtn').addEventListener('click', () => {
             modal.remove();
             resolve(true);
         });
-        
-        if (showInvoiceListBtn) {
-            modal.querySelector('.custom-modal-btn-secondary').addEventListener('click', () => {
-                modal.remove();
-                document.getElementById('viewInvoicesBtn')?.click();
-                resolve(true);
+
+        if (pdfUrl) {
+            modal.querySelector('#_previewBtn').addEventListener('click', () => {
+                let fileId = '';
+                if (pdfUrl.includes('/d/'))  fileId = pdfUrl.split('/d/')[1].split('/')[0];
+                else if (pdfUrl.includes('id=')) fileId = pdfUrl.split('id=')[1].split('&')[0];
+                const previewUrl = fileId ? `https://drive.google.com/file/d/${fileId}/preview` : pdfUrl;
+                window.open(previewUrl, '_blank');
+            });
+        }
+
+        if (shareData) {
+            modal.querySelector('#_shareBtn').addEventListener('click', () => {
+                let fileId = '';
+                if (shareData.pdfUrl.includes('/d/'))  fileId = shareData.pdfUrl.split('/d/')[1].split('/')[0];
+                else if (shareData.pdfUrl.includes('id=')) fileId = shareData.pdfUrl.split('id=')[1].split('&')[0];
+                const link = fileId ? `https://drive.google.com/file/d/${fileId}/view` : shareData.pdfUrl;
+                const text = `Hii ${shareData.toName},\nPlease find the invoice here: ${shareData.invoiceNo}\n${link}`;
+                navigator.clipboard.writeText(text).then(() => {
+                    const btn = modal.querySelector('#_shareBtn');
+                    btn.textContent = '✅ Copied!';
+                    setTimeout(() => { btn.innerHTML = '📤 Share Invoice'; }, 2000);
+                });
             });
         }
     });

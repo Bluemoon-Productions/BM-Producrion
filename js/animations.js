@@ -325,7 +325,8 @@ function initNavGlow() {
 
 // ---- 14. STATS COUNTER ANIMATION ----
 function initStatsCounter() {
-    const counters = document.querySelectorAll('.stat-number');
+    // Only run on elements that have a data-target attribute (index.html about section)
+    const counters = document.querySelectorAll('.stat-number[data-target]');
     if (!counters.length) return;
 
     const observer = new IntersectionObserver((entries) => {
@@ -333,6 +334,7 @@ function initStatsCounter() {
             if (!entry.isIntersecting) return;
             const el = entry.target;
             const target = parseInt(el.dataset.target);
+            if (isNaN(target)) return;
             const duration = 1800;
             const step = target / (duration / 16);
             let current = 0;

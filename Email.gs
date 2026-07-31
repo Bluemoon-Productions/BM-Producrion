@@ -1,7 +1,4 @@
-const SPREADSHEET_ID = '1MaNVyZ_4qJ29I7jzxfCuZIIFCEAw8W5xQ8xolYAEOL8';
-const DRIVE_FOLDER_ID = '1t9584xnhVxqvMUrzDUn9e4y2pU-vpjZa';
-
-const SHEETS = {
+const EMAIL_SHEETS = {
   CONTACT: 'ContactForm',
   DRAFTS: 'DraftEmails'
 };
@@ -34,7 +31,7 @@ function handleEmailOperation(data) {
 function getClientsList() {
   try {
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-    const sheet = ss.getSheetByName(SHEETS.CONTACT);
+    const sheet = ss.getSheetByName(EMAIL_SHEETS.CONTACT);
     
     if (!sheet) {
       return { success: true, clients: [] };
@@ -77,7 +74,7 @@ function getClientsList() {
 function checkEmailExists(email) {
   try {
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-    const sheet = ss.getSheetByName(SHEETS.CONTACT);
+    const sheet = ss.getSheetByName(EMAIL_SHEETS.CONTACT);
     
     if (!sheet) {
       return { success: true, exists: false, isReply: false };
@@ -171,10 +168,10 @@ function sendClientEmail(data) {
 function saveDraftEmail(data) {
   try {
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-    let sheet = ss.getSheetByName(SHEETS.DRAFTS);
+    let sheet = ss.getSheetByName(EMAIL_SHEETS.DRAFTS);
     
     if (!sheet) {
-      sheet = ss.insertSheet(SHEETS.DRAFTS);
+      sheet = ss.insertSheet(EMAIL_SHEETS.DRAFTS);
       sheet.appendRow([
         'Timestamp',
         'To',
@@ -209,7 +206,7 @@ function saveDraftEmail(data) {
 function getDraftsList() {
   try {
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-    const sheet = ss.getSheetByName(SHEETS.DRAFTS);
+    const sheet = ss.getSheetByName(EMAIL_SHEETS.DRAFTS);
     
     if (!sheet) {
       return { success: true, drafts: [] };
@@ -244,7 +241,7 @@ function getDraftsList() {
 function deleteDraft(draftId) {
   try {
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-    const sheet = ss.getSheetByName(SHEETS.DRAFTS);
+    const sheet = ss.getSheetByName(EMAIL_SHEETS.DRAFTS);
     
     if (!sheet) {
       return { success: false, error: 'Drafts sheet not found' };
@@ -263,7 +260,7 @@ function deleteDraft(draftId) {
 function updateDraftStatus(draftId, status) {
   try {
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-    const sheet = ss.getSheetByName(SHEETS.DRAFTS);
+    const sheet = ss.getSheetByName(EMAIL_SHEETS.DRAFTS);
     
     if (!sheet) {
       return { success: false, error: 'Drafts sheet not found' };

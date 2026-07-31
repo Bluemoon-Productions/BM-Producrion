@@ -1,6 +1,6 @@
 // Google Apps Script Configuration
 const CONFIG = {
-    SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxZy5PY6DsJJulX46MSnRorO-kli-_tQn_YnAOxX9mocMDH0-J2InY_B0tgg1TCt-Uw/exec',
+    SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzmGZmx6GtGAiTt68kXXQmCMgkj3VPYh9q-Ee8vXqwtiOyprVqx2x9RdF1Uujl3hi17/exec',
     
     // Sheet names (must match your Google Sheets)
     SHEETS: {
@@ -16,6 +16,8 @@ const CONFIG = {
         LOGIN: 'checkLogin',
         INVOICE: 'generateInvoice',
         GET_INVOICES: 'getInvoices',
-        GET_INVOICE_DETAILS: 'getInvoiceDetails'
+        GET_INVOICE_DETAILS: 'getInvoiceDetails',
+        DELETE_INVOICE: 'deleteInvoice',
+        UPDATE_STATUS: 'updateInvoiceStatus'
     }
 };

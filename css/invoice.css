@@ -7,7 +7,6 @@ body {
     padding: 20px;
     font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
     color: rgba(255,255,255,0.85);
-    cursor: none;
     min-height: 100vh;
 }
 
@@ -674,7 +673,7 @@ body {
 .invoice-list-header {
     background: linear-gradient(135deg, rgba(53,36,135,0.7), rgba(106,61,232,0.5));
     color: white;
-    padding: 40px 20px;
+    padding: 30px 20px 24px;
     text-align: center;
     border-radius: 16px;
     margin-bottom: 30px;
@@ -689,6 +688,114 @@ body {
     -webkit-text-fill-color: transparent;
     background-clip: text;
     font-size: 2.5rem;
+}
+
+/* ---- DATE FILTER BAR ---- */
+.date-filter-bar {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 22px;
+    flex-wrap: wrap;
+}
+
+.date-filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    text-align: left;
+}
+
+.date-filter-group label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: rgba(255,255,255,0.5);
+}
+
+.date-filter-group input[type="date"] {
+    padding: 9px 14px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    color-scheme: dark;
+}
+
+.date-filter-group select {
+    padding: 9px 14px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.date-filter-group select option {
+    background: #1a1a2e;
+    color: #fff;
+}
+
+.date-filter-group select:focus {
+    outline: none;
+    border-color: var(--highlight-color);
+    box-shadow: 0 0 14px rgba(53,36,135,0.4);
+}
+
+.date-filter-group input[type="date"]:focus {
+    outline: none;
+    border-color: var(--highlight-color);
+    box-shadow: 0 0 14px rgba(53,36,135,0.4);
+}
+
+.filter-apply-btn {
+    padding: 9px 22px;
+    background: linear-gradient(135deg, var(--highlight-color), #6a3de8);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.25s, box-shadow 0.25s;
+    letter-spacing: 0.5px;
+}
+
+.filter-apply-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(53,36,135,0.5);
+}
+
+.filter-clear-btn {
+    padding: 9px 18px;
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.6);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.25s, transform 0.25s;
+}
+
+.filter-clear-btn:hover {
+    background: rgba(255,255,255,0.12);
+    transform: translateY(-2px);
+}
+
+@media (max-width: 600px) {
+    .date-filter-bar { flex-direction: column; align-items: stretch; }
+    .filter-apply-btn, .filter-clear-btn { width: 100%; }
 }
 
 .invoice-list-container {
@@ -733,6 +840,64 @@ body {
     -webkit-text-fill-color: transparent;
     background-clip: text;
     margin-bottom: 10px;
+}
+
+.stat-number-sm {
+    font-size: 1.6rem;
+}
+
+.stat-label {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stats-grid-amounts {
+    margin-top: 16px;
+    margin-bottom: 40px;
+}
+
+.stat-card.stat-paid {
+    border-color: rgba(40,167,69,0.3);
+}
+.stat-card.stat-paid .stat-number {
+    background: linear-gradient(135deg, #fff, #28a745);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.stat-card.stat-paid:hover {
+    border-color: #28a745;
+    box-shadow: 0 10px 30px rgba(40,167,69,0.25);
+}
+
+.stat-card.stat-pending {
+    border-color: rgba(255,193,7,0.3);
+}
+.stat-card.stat-pending .stat-number {
+    background: linear-gradient(135deg, #fff, #ffc107);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.stat-card.stat-pending:hover {
+    border-color: #ffc107;
+    box-shadow: 0 10px 30px rgba(255,193,7,0.25);
+}
+
+.stat-card.stat-generated {
+    border-color: rgba(0,123,255,0.3);
+}
+.stat-card.stat-generated .stat-number {
+    background: linear-gradient(135deg, #fff, #5ba8ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.stat-card.stat-generated:hover {
+    border-color: #5ba8ff;
+    box-shadow: 0 10px 30px rgba(0,123,255,0.25);
 }
 
 .no-invoices {
@@ -814,9 +979,209 @@ body {
 }
 
 .invoice-amount {
-    font-size: 2rem;
+    font-size: 1.6rem;
     font-weight: bold;
     color: #5dde7a;
-    margin: 20px 0;
+    margin: 16px 0 4px;
     text-shadow: 0 0 15px rgba(93, 222, 122, 0.3);
+}
+
+.amt-divider {
+    color: rgba(255,255,255,0.3);
+    font-weight: 300;
+    margin: 0 4px;
+}
+
+.invoice-amount-label {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+}
+
+/* ---- UPDATE STATUS BUTTON ---- */
+.update-btn { background: rgba(53,36,135,0.2); color: #9b6dff; border: 1px solid rgba(53,36,135,0.4); }
+.update-btn:hover { background: rgba(53,36,135,0.4); transform: translateY(-2px); }
+
+/* ---- Invoice List Action Buttons ---- */
+.invoice-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.inv-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 10px 8px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+    backdrop-filter: blur(6px);
+}
+
+.inv-btn i { font-size: 0.85rem; }
+
+.inv-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+.inv-btn:active { transform: translateY(0); }
+
+.inv-preview {
+    background: rgba(0,123,255,0.12);
+    color: #5ba8ff;
+    border-color: rgba(0,123,255,0.3);
+}
+.inv-preview:hover { background: rgba(0,123,255,0.28); box-shadow: 0 6px 20px rgba(0,123,255,0.2); }
+
+.inv-share {
+    background: rgba(40,167,69,0.12);
+    color: #5dde7a;
+    border-color: rgba(40,167,69,0.3);
+}
+.inv-share:hover { background: rgba(40,167,69,0.28); box-shadow: 0 6px 20px rgba(40,167,69,0.2); }
+
+.inv-delete {
+    background: rgba(233,69,96,0.12);
+    color: #ff6b8a;
+    border-color: rgba(233,69,96,0.3);
+}
+.inv-delete:hover { background: rgba(233,69,96,0.28); box-shadow: 0 6px 20px rgba(233,69,96,0.2); }
+
+.inv-update {
+    background: rgba(155,109,255,0.12);
+    color: #b48aff;
+    border-color: rgba(155,109,255,0.3);
+}
+.inv-update:hover { background: rgba(155,109,255,0.28); box-shadow: 0 6px 20px rgba(155,109,255,0.2); }
+
+/* Tablet: 4 buttons in a row */
+@media (min-width: 600px) {
+    .invoice-actions { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Mobile: icon only, label hidden */
+@media (max-width: 400px) {
+    .inv-btn span { display: none; }
+    .inv-btn { padding: 11px; }
+    .inv-btn i { font-size: 1rem; }
+}
+
+/* ---- STATUS MODAL ---- */
+.status-modal-content {
+    max-width: 460px;
+}
+
+.status-invoice-no {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.9rem;
+    margin: -10px 0 20px;
+}
+
+.status-options {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.status-opt-btn {
+    flex: 1;
+    padding: 12px 8px;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.25s;
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.6);
+}
+
+.status-opt-btn.paid   { border-color: rgba(40,167,69,0.3); }
+.status-opt-btn.pending { border-color: rgba(255,193,7,0.3); }
+.status-opt-btn.rejected { border-color: rgba(233,69,96,0.3); }
+
+.status-opt-btn.paid.active   { background: rgba(40,167,69,0.25); color: #5dde7a; border-color: #28a745; box-shadow: 0 0 14px rgba(40,167,69,0.3); }
+.status-opt-btn.pending.active { background: rgba(255,193,7,0.2); color: #ffd54f; border-color: #ffc107; box-shadow: 0 0 14px rgba(255,193,7,0.3); }
+.status-opt-btn.rejected.active { background: rgba(233,69,96,0.2); color: #ff6b7a; border-color: #e94560; box-shadow: 0 0 14px rgba(233,69,96,0.3); }
+
+.remark-label {
+    display: block;
+    color: rgba(255,255,255,0.5);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.status-remark-input {
+    width: 100%;
+    padding: 11px 14px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.95rem;
+    resize: vertical;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.status-remark-input:focus {
+    outline: none;
+    border-color: var(--highlight-color);
+    box-shadow: 0 0 16px rgba(53,36,135,0.35);
+}
+
+.status-done-btn {
+    display: none;
+}
+
+.status-modal-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.status-modal-confirm {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.inv-cancel {
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.5);
+    border-color: rgba(255,255,255,0.15);
+}
+.inv-cancel:hover { background: rgba(255,255,255,0.1); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
+
+.inv-done {
+    background: rgba(53,36,135,0.2);
+    color: #b48aff;
+    border-color: rgba(155,109,255,0.4);
+    font-weight: 700;
+}
+.inv-done:hover { background: rgba(53,36,135,0.45); box-shadow: 0 6px 20px rgba(53,36,135,0.35); }
+
+@media (max-width: 360px) {
+    .status-modal-actions .inv-btn span,
+    .status-modal-confirm .inv-btn span { display: none; }
+    .status-modal-actions .inv-btn,
+    .status-modal-confirm .inv-btn { padding: 11px; }
 }
