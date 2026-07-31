@@ -1,6 +1,6 @@
 // Google Apps Script Configuration
 const CONFIG = {
-    SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzyNlbImBzc6MLOuf5b8jBbokFzK7S7Culpd5Nx9XHgcW19abulRHE3mZBzcx-3UAAM/exec',
+    SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzmGZmx6GtGAiTt68kXXQmCMgkj3VPYh9q-Ee8vXqwtiOyprVqx2x9RdF1Uujl3hi17/exec',
     
     // Sheet names (must match your Google Sheets)
     SHEETS: {

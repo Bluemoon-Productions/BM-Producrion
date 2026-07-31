@@ -224,45 +224,6 @@ function addMobileProfile(user) {
     if (existingMobile) existingMobile.remove();
 
     if (window.innerWidth <= 768 && navMenu) {
-        const currentTheme = localStorage.getItem('selectedTheme') || 'purple';
-        const isAdmin = user.role && user.role.toLowerCase() === 'admin';
-
-        const themeSection = isAdmin ? `
-            <div class="mobile-theme-section">
-                <h4>🎨 Select Theme</h4>
-                <div class="mobile-theme-list">
-                    <div class="mobile-theme-item ${currentTheme === 'purple' ? 'active' : ''}" data-theme="purple">
-                        <div class="mobile-theme-circle theme-purple"></div>
-                        <span class="mobile-theme-label">Purple</span>
-                    </div>
-                    <div class="mobile-theme-item ${currentTheme === 'pink' ? 'active' : ''}" data-theme="pink">
-                        <div class="mobile-theme-circle theme-pink"></div>
-                        <span class="mobile-theme-label">Pink</span>
-                    </div>
-                    <div class="mobile-theme-item ${currentTheme === 'holi' ? 'active' : ''}" data-theme="holi">
-                        <div class="mobile-theme-circle theme-holi"></div>
-                        <span class="mobile-theme-label">Holi</span>
-                    </div>
-                    <div class="mobile-theme-item ${currentTheme === 'diwali' ? 'active' : ''}" data-theme="diwali">
-                        <div class="mobile-theme-circle theme-diwali"></div>
-                        <span class="mobile-theme-label">Diwali</span>
-                    </div>
-                    <div class="mobile-theme-item ${currentTheme === 'independence' ? 'active' : ''}" data-theme="independence">
-                        <div class="mobile-theme-circle theme-independence"></div>
-                        <span class="mobile-theme-label">Independence</span>
-                    </div>
-                    <div class="mobile-theme-item ${currentTheme === 'dark' ? 'active' : ''}" data-theme="dark">
-                        <div class="mobile-theme-circle theme-dark"></div>
-                        <span class="mobile-theme-label">Dark</span>
-                    </div>
-                </div>
-                <div class="mobile-theme-buttons">
-                    <button class="mobile-theme-cancel-btn" id="mobileThemeCancelBtn">Cancel</button>
-                    <button class="mobile-theme-apply-btn" id="mobileThemeApplyBtn">Apply</button>
-                </div>
-            </div>
-        ` : '';
-
         const mobileProfile = document.createElement('li');
         mobileProfile.className = 'mobile-profile';
         mobileProfile.innerHTML = `
@@ -271,38 +232,10 @@ function addMobileProfile(user) {
                 <p>${user.email}</p>
                 ${user.stageName ? `<p>Stage: ${user.stageName}</p>` : ''}
             </div>
-            ${themeSection}
             <button class="logout-btn" id="mobileLogoutBtn">Logout</button>
         `;
 
         navMenu.appendChild(mobileProfile);
-
-        if (isAdmin) {
-            let selectedTheme = currentTheme;
-
-            mobileProfile.querySelectorAll('.mobile-theme-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    selectedTheme = item.dataset.theme;
-                    mobileProfile.querySelectorAll('.mobile-theme-item').forEach(i => i.classList.remove('active'));
-                    item.classList.add('active');
-                });
-            });
-
-            document.getElementById('mobileThemeApplyBtn').addEventListener('click', async () => {
-                if (window.themeManager) {
-                    window.themeManager.switchTheme(selectedTheme);
-                    await customAlert('Theme applied successfully!', 'Success', '🎨');
-                }
-            });
-
-            document.getElementById('mobileThemeCancelBtn').addEventListener('click', () => {
-                selectedTheme = currentTheme;
-                mobileProfile.querySelectorAll('.mobile-theme-item').forEach(i => {
-                    i.classList.remove('active');
-                    if (i.dataset.theme === currentTheme) i.classList.add('active');
-                });
-            });
-        }
 
         document.getElementById('mobileLogoutBtn').addEventListener('click', async () => {
             localStorage.removeItem('user');
