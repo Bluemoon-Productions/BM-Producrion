@@ -39,11 +39,15 @@
 }
 
 /* Icons on hover */
-.service-card:hover i,
 .instrument-icon:hover,
 .footer-social a:hover,
 .user-profile:hover i {
     color: var(--accent-color) !important;
+    transform: scale(1.2);
+}
+
+.service-card:hover i{
+    color: #ffffff !important;
     transform: scale(1.2);
 }
 
