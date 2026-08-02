@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function fetchFromServer() {
     const response = await fetch(CONFIG.SCRIPT_URL, {
         method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: CONFIG.ACTIONS.GET_INVOICES })
     });
     const result = await response.json();
@@ -295,6 +296,7 @@ async function deleteInvoice(invoiceNo) {
     try {
         const response = await fetch(CONFIG.SCRIPT_URL, {
             method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({ action: CONFIG.ACTIONS.DELETE_INVOICE, invoiceNo, remark: reason || '' })
         });
         const result = await response.json();
@@ -567,6 +569,7 @@ async function submitStatusUpdate(invoiceNo) {
     try {
         const response = await fetch(CONFIG.SCRIPT_URL, {
             method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({ action: CONFIG.ACTIONS.UPDATE_STATUS, invoiceNo, status, remark, finalPayment })
         });
         const result = await response.json();

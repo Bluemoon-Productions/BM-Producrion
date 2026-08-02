@@ -104,8 +104,6 @@
     }
 
     .admin-sidebar-header img.sidebar-favicon {
-        width: 28px;
-        height: 28px;
         border-radius: 6px;
         opacity: 0.85;
         transition: opacity 0.2s;

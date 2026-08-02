@@ -10,20 +10,26 @@ function handleSignup(data) {
       sheet.appendRow(['Timestamp', 'Full Name', 'Stage Name', 'Email', 'Phone', 'Password', 'Status', 'Role']);
     }
 
+    // Normalize
+    const email    = (data.email    || '').trim().toLowerCase();
+    const password = (data.password || '').trim();
+    const fullName = (data.fullName || '').trim();
+    const phone    = (data.phone    || '').trim();
+
     const rows = sheet.getDataRange().getValues();
     for (let i = 1; i < rows.length; i++) {
-      if (rows[i][3] === data.email) {
+      if ((rows[i][3] || '').toString().trim().toLowerCase() === email) {
         return { success: false, error: 'Email already registered' };
       }
     }
 
     sheet.appendRow([
       new Date(),
-      data.fullName,
-      data.stageName || '',
-      data.email,
-      data.phone,
-      data.password,
+      fullName,
+      (data.stageName || '').trim(),
+      email,
+      phone,
+      password,
       'Inactive',
       'User'
     ]);
@@ -41,23 +47,30 @@ function handleLogin(data) {
 
     if (!sheet) return { success: false, error: 'No users registered yet' };
 
+    // Normalize input — trim whitespace, lowercase email
+    const inputEmail    = (data.email    || '').trim().toLowerCase();
+    const inputPassword = (data.password || '').trim();
+
     const rows = sheet.getDataRange().getValues();
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
-      if (row[3] === data.email && row[5] === data.password) {
-        const status = row[6] || 'Inactive';
+      const rowEmail    = (row[3] || '').toString().trim().toLowerCase();
+      const rowPassword = (row[5] || '').toString().trim();
+
+      if (rowEmail === inputEmail && rowPassword === inputPassword) {
+        const status = (row[6] || 'Inactive').toString().trim();
         if (status !== 'Active') {
           return { success: false, error: 'Account not active. Contact admin for approval.' };
         }
         return {
           success: true,
           user: {
-            fullName: row[1],
-            stageName: row[2],
-            email: row[3],
-            phone: row[4],
-            status: status,
-            role: row[7] || 'User'
+            fullName:  (row[1] || '').toString().trim(),
+            stageName: (row[2] || '').toString().trim(),
+            email:     row[3].toString().trim(),
+            phone:     (row[4] || '').toString().trim(),
+            status:    status,
+            role:      (row[7] || 'User').toString().trim()
           }
         };
       }

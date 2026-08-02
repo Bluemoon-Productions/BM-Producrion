@@ -261,6 +261,7 @@ function initInvoicePage() {
             showInvoiceLoading(true, 'Generating invoice...');
             const response = await fetch(CONFIG.SCRIPT_URL, {
                 method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(invoiceData)
             });
             const result = await response.json();
@@ -365,6 +366,7 @@ function initInvoicePage() {
         try {
             const response = await fetch(CONFIG.SCRIPT_URL, {
                 method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: CONFIG.ACTIONS.GET_INVOICES })
             });
             const result = await response.json();
@@ -432,6 +434,7 @@ function initInvoicePage() {
         try {
             const response = await fetch(CONFIG.SCRIPT_URL, {
                 method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: CONFIG.ACTIONS.GET_INVOICE_DETAILS, invoiceNo })
             });
             const result = await response.json();

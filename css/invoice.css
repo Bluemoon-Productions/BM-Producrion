@@ -79,26 +79,35 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: rgba(255,255,255,0.06);
-    color: rgba(255,255,255,0.85);
-    border: 1px solid rgba(255,255,255,0.12);
-    padding: 10px 22px;
+    padding: 12px 22px;
+    background: linear-gradient(135deg, var(--highlight-color), #6a3de8);
+    color: white;
+    border: none;
     border-radius: 8px;
     cursor: pointer;
     font-size: 0.9rem;
     font-weight: 600;
     font-family: inherit;
     letter-spacing: 0.5px;
-    transition: all 0.3s;
-    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     text-decoration: none;
+    position: relative;
+    overflow: hidden;
 }
 
+.view-invoices-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.15);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.view-invoices-btn:hover::before { opacity: 1; }
 .view-invoices-btn:hover {
-    background: rgba(53,36,135,0.4);
-    border-color: var(--highlight-color);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(53,36,135,0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(53,36,135,0.5);
 }
 
 /* ---- SHARED PAGE HEADER ---- */

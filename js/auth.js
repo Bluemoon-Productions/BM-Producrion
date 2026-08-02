@@ -75,9 +75,13 @@ signupFormElement.addEventListener('submit', async (e) => {
         showLoading(true);
         const response = await fetch(CONFIG.SCRIPT_URL, {
             method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify(formData)
         });
-        const result = await response.json();
+        const text = await response.text();
+        let result;
+        try { result = JSON.parse(text); }
+        catch(pe) { throw new Error('Bad response'); }
         showLoading(false);
 
         if (result.success) {
@@ -98,18 +102,28 @@ signupFormElement.addEventListener('submit', async (e) => {
 loginFormElement.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const email    = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value;
+    // Trim + normalize — handles autofill spaces, case issues
+    const email    = document.getElementById('loginEmail').value.trim().toLowerCase();
+    const password = document.getElementById('loginPassword').value.trim();
+
+    if (!email || !password) {
+        showError('Please enter your email and password.');
+        return;
+    }
 
     try {
         showLoading(true);
 
         const response = await fetch(CONFIG.SCRIPT_URL, {
             method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({ action: CONFIG.ACTIONS.LOGIN, email, password })
         });
 
-        const result = await response.json();
+        const text = await response.text();
+        let result;
+        try { result = JSON.parse(text); }
+        catch(pe) { throw new Error('Bad response: ' + text.substring(0, 100)); }
         showLoading(false);
 
         if (result.success) {
