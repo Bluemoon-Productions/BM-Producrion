@@ -1,12 +1,13 @@
 // Google Apps Script Configuration
 const CONFIG = {
-    SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwRM19epQ62PKqJV2SNwurS7nXBPWhSWakvj9Li7QhDK455tx-muIUAt_jBl7uTy-Y/exec',
+    SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxgk3KwSgPuG9bIFhpD7stS5PW1Cp3mpsveQ9Yohg2uRKSy3HPRJkEynljzSlm1vhnz/exec',
     
     // Sheet names (must match your Google Sheets)
     SHEETS: {
         CONTACT: 'ContactForm',
         SIGNUP: 'SignupData',
-        INVOICE: 'InvoiceData'
+        INVOICE: 'InvoiceData',
+        FIRST_EMAIL: 'FirstEmail'
     },
     
     // Actions for Google Apps Script
