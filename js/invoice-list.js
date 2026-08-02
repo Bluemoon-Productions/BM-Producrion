@@ -538,7 +538,7 @@ async function submitStatusUpdate(invoiceNo) {
             const fpActive = modal.querySelector('.fp-btn.active');
             if (fpActive && fpActive.dataset.fp === 'no') {
                 const noReason = modal.querySelector('#fpNoReason')?.value.trim() || '';
-                remark = noReason ? 'NOT_RECEIVED: ' + noReason : 'NOT_RECEIVED';
+                remark = noReason ? 'not_received: ' + noReason : 'not_received';
                 finalPayment = ''; 
             } else if (fpActive && fpActive.dataset.fp === 'yes') {
                 remark = '';
