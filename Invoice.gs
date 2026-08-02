@@ -9,7 +9,8 @@ function handleInvoice(data) {
       sheet = ss.insertSheet(SHEETS.INVOICE);
       sheet.appendRow(['Invoice Number', 'Timestamp', 'Customer Name', 'Customer Email', 'Customer Phone',
         'Invoice Date', 'Due Date', 'Subtotal', 'Advance Payment', 'Balance Due',
-        'Total Amount', 'Payment Method', 'Status', 'PDF URL', 'Terms', 'UPI ID', 'Remark']);
+        'Total Amount', 'Payment Method', 'Status', 'PDF URL', 'Terms',
+        'UPI ID', 'UPI User Name', 'Bank Details', 'Bank User Name', 'Remark', 'Final Payment']);
     }
 
     let pdfUrl = '';
@@ -22,23 +23,30 @@ function handleInvoice(data) {
     }
 
     sheet.appendRow([
-      data.invoiceNo,
-      new Date(),
-      data.to.name,
-      data.to.email,
-      data.to.phone,
-      data.invoiceDate,
-      data.dueDate,
-      data.subTotal,
-      data.advancePayment,
-      data.balanceDue,
-      data.total,
-      data.paymentMethod,
-      'Generated',
-      pdfUrl,
-      data.terms || '',
-      data.paymentDetails.upi ? data.paymentDetails.upi.upiId : '',
-      ''
+      data.invoiceNo,           // A
+      new Date(),               // B
+      data.to.name,             // C
+      data.to.email,            // D
+      data.to.phone,            // E
+      data.invoiceDate,         // F
+      data.dueDate,             // G
+      data.subTotal,            // H
+      data.advancePayment,      // I
+      data.balanceDue,          // J
+      data.total,               // K
+      data.paymentMethod === 'upi' ? 'UPI' : 'AC',  // L
+      'Generated',              // M
+      pdfUrl,                   // N
+      data.terms || '',         // O
+      data.paymentDetails.upi  ? data.paymentDetails.upi.upiId  : '',  // P - UPI ID
+      data.paymentDetails.upi  ? data.paymentDetails.upi.name   : '',  // Q - UPI User Name
+      data.paymentDetails.bank ? JSON.stringify({
+        accountNumber: data.paymentDetails.bank.accountNumber,
+        ifscCode:      data.paymentDetails.bank.ifscCode
+      }) : '',                  // R - Bank Details JSON
+      data.paymentDetails.bank ? data.paymentDetails.bank.accountHolder : '',  // S - Bank User Name
+      '',                       // T - Remark
+      ''                        // U - Final Payment
     ]);
 
     return { success: true, message: 'Invoice generated successfully', invoiceNo: data.invoiceNo, pdfUrl };
@@ -59,16 +67,23 @@ function getInvoices(data) {
       const row = rows[i];
       if ((row[12] || '').toString().toLowerCase() === 'deleted') continue;
       invoices.push({
-        invoiceNo: row[0],
-        timestamp: row[1],
-        customerName: row[2],
-        customerEmail: row[3],
-        customerPhone: row[4],
-        totalAmount: row[10],
-        advancePayment: row[8],
-        status: row[12],
-        pdfUrl: row[13],
-        remark: row[16] || '',
+        invoiceNo:       row[0],
+        timestamp:       row[1],
+        customerName:    row[2],
+        customerEmail:   row[3],
+        customerPhone:   row[4],
+        totalAmount:     row[10],
+        advancePayment:  row[8],
+        balanceDue:      row[9],
+        paymentMethod:   row[11],
+        status:          row[12],
+        pdfUrl:          row[13],
+        upiId:           row[15],
+        upiName:         row[16],
+        bankDetails:     row[17],
+        bankUserName:    row[18],
+        remark:          row[19] || '',
+        finalPayment:    row[20] || '',
         rowIndex: i + 1
       });
     }
@@ -94,7 +109,8 @@ function getInvoiceDetails(data) {
             invoiceNo: row[0], customerName: row[2], customerEmail: row[3],
             customerPhone: row[4], invoiceDate: row[5], dueDate: row[6],
             subTotal: row[7], advancePayment: row[8], balanceDue: row[9],
-            total: row[10], paymentMethod: row[11], terms: row[14], upiId: row[15]
+            total: row[10], paymentMethod: row[11], terms: row[14],
+            upiId: row[15], upiName: row[16], bankDetails: row[17], bankUserName: row[18]
           }
         };
       }
@@ -114,8 +130,14 @@ function updateInvoiceStatus(data) {
     const rows = sheet.getDataRange().getValues();
     for (let i = 1; i < rows.length; i++) {
       if (rows[i][0] === data.invoiceNo) {
-        sheet.getRange(i + 1, 13).setValue(data.status);
-        sheet.getRange(i + 1, 17).setValue(data.remark || '');
+        sheet.getRange(i + 1, 13).setValue(data.status);   // M - Status
+        sheet.getRange(i + 1, 20).setValue(data.remark || ''); // T - Remark
+        if (data.finalPayment) {
+          const existing = rows[i][20] || '';
+          const updated  = existing ? existing + ', ' + data.finalPayment : data.finalPayment;
+          sheet.getRange(i + 1, 21).setValue(updated);     // U - Final Payment
+          sheet.getRange(i + 1, 10).setValue(0);           // J - Balance Due = 0
+        }
         return { success: true, message: 'Status updated successfully' };
       }
     }
@@ -135,6 +157,7 @@ function deleteInvoice(data) {
     for (let i = 1; i < rows.length; i++) {
       if (rows[i][0] === data.invoiceNo) {
         sheet.getRange(i + 1, 13).setValue('Deleted');
+        if (data.remark) sheet.getRange(i + 1, 20).setValue(data.remark);
         return { success: true, message: 'Invoice marked as deleted' };
       }
     }
