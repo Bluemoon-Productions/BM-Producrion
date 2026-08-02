@@ -38,7 +38,7 @@ function handleFirstEmail(data) {
 
     message += `
       <p>Our team will review your request and get back to you shortly with more details on how we can help you achieve your goals. In the meantime, feel free to check out our portfolio and see what we've done for other artists like you.</p>
-      <p style="text-align: center; margin: 20px 0;"><a href="https://www.instagram.com/bluemoon_production/" target="_blank" style="color: #352487; text-decoration: none; font-weight: bold;">Bluemoon Production</a></p>
+      <p style="text-align: center; margin: 20px 0;"><a href="https://www.instagram.com/bluemoonproduction_/" target="_blank" style="background-color: #352487; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Bluemoon Production</a></p>
     `;
 
     const htmlBody = createEmailTemplate(subject, message);
