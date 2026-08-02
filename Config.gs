@@ -5,7 +5,8 @@ const DRIVE_FOLDER_ID = '1t9584xnhVxqvMUrzDUn9e4y2pU-vpjZa';
 const SHEETS = {
   CONTACT: 'ContactForm',
   SIGNUP: 'SignupData',
-  INVOICE: 'InvoiceData'
+  INVOICE: 'InvoiceData',
+  FIRST_EMAIL: 'FirstEmail'
 };
 
 function doPost(e) {
@@ -23,6 +24,7 @@ function doPost(e) {
       case 'getInvoiceDetails': result = getInvoiceDetails(data); break;
       case 'deleteInvoice':   result = deleteInvoice(data); break;
       case 'updateInvoiceStatus': result = updateInvoiceStatus(data); break;
+      case 'sendFirstEmail': result = handleFirstEmail(data); break;
       // Email actions
       case 'getClients':
       case 'checkEmailExists':

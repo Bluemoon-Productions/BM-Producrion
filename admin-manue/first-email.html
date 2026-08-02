@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send First Email - Bluemoon Production</title>
+    <link rel="icon" type="image/png" href="../images/bm_favicon.png">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/invoice.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/first-email.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/virtual-select-plugin@1.0.39/dist/virtual-select.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Admin Sidebar -->
+        <nav class="admin-sidebar" id="adminSidebar">
+            <div class="admin-sidebar-header">
+                <img src="../images/bm_favicon.png" class="sidebar-favicon" alt="BM">
+            </div>
+            <ul class="admin-menu">
+                <li class="admin-menu-item">
+                    <a href="invoice.html">
+                        <i class="fas fa-file-invoice-dollar icon"></i>
+                        <span class="text">Invoice Generator</span>
+                    </a>
+                </li>
+                <li class="admin-menu-item">
+                    <a href="invoice-list.html" id="adminViewInvoices">
+                        <i class="fas fa-list-alt icon"></i>
+                        <span class="text">View Invoices</span>
+                    </a>
+                </li>
+                <li class="admin-menu-item">
+                    <a href="first-email.html">
+                        <i class="fas fa-envelope-open-text icon"></i>
+                        <span class="text">First Email</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <div class="top-nav-bar">
+            <div class="top-nav-left">
+                <a href="../index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Home</a>
+            </div>
+            <div class="nav-logo">
+                <img class="invoice-logo" src="../images/bluemoon_production.gif" alt="Bluemoon Production" onerror="this.style.display='none'">
+            </div>
+        </div>
+        
+        <div class="page-header">
+            <h1><i class="fas fa-envelope-open-text"></i> Send First Email</h1>
+            <p>Send initial email to clients from outside the website</p>
+        </div>
+
+        <form id="firstEmailForm" class="invoice-form">
+            <h3>Client Details</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="clientName">Client Full Name *</label>
+                    <input type="text" id="clientName" required>
+                </div>
+                <div class="form-group">
+                    <label for="stageName">Stage Name</label>
+                    <input type="text" id="stageName">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="email">Email ID *</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Mobile/WhatsApp Number</label>
+                    <input type="tel" id="phone">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="instagram">Instagram Profile URL</label>
+                    <input type="url" id="instagram" placeholder="https://instagram.com/username">
+                </div>
+            </div>
+
+            <h3>Services</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="services">Services *</label>
+                    <div id="services-multiselect"></div>
+                </div>
+            </div>
+
+            <h3>Additional Message</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="additionalMessage">Additional Message</label>
+                    <textarea id="additionalMessage" rows="5"></textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">Send Email</button>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/virtual-select-plugin@1.0.39/dist/virtual-select.min.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/theme.js"></script>
+    <script src="../js/admin-sidebar.js"></script>
+    <script src="../js/first-email.js"></script>
+    <script src="../js/animations.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user && user.role && user.role.toLowerCase() === 'admin') {
+                document.body.classList.add('admin-view');
+            } else {
+                window.location.href = '../index.html';
+            }
+        });
+    </script>
+</body>
+</html>

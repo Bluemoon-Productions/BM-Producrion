@@ -34,6 +34,12 @@
                         <span class="text">View Invoices</span>
                     </a>
                 </li>
+                <li class="admin-menu-item">
+                    <a href="first-email.html">
+                        <i class="fas fa-envelope-open-text icon"></i>
+                        <span class="text">First Email</span>
+                    </a>
+                </li>
             </ul>
         </nav>
         <div class="top-nav-bar">
@@ -143,8 +149,8 @@
                     <tr class="item-row">
                         <td>1</td>
                         <td><input type="text" class="item-desc" placeholder="Item description" required></td>
-                        <td><input type="number" class="item-qty" value="1" min="1" required></td>
-                        <td><input type="number" class="item-amount" placeholder="0" step="100" required></td>
+                        <td><input type="number" class="item-qty" value="1" min="1" placeholder="Qty" required></td>
+                        <td><input type="number" class="item-amount" placeholder="Amount" step="100" required></td>
                         <td><button type="button" class="remove-item" onclick="removeItem(this)">Remove</button></td>
                     </tr>
                 </tbody>
