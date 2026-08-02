@@ -43,7 +43,7 @@ function buildContactAckEmail(data) {
     <html><head><style>
       body{font-family:Arial,sans-serif;line-height:1.6;color:#333}
       .container{max-width:600px;margin:0 auto;padding:20px}
-      .header{background:linear-gradient(135deg,#1a1a2e 0%,#352487 100%);color:white;padding:30px;text-align:center;border-radius:10px 10px 0 0}
+      .header{background:linear-gradient(135deg,#1a1a2e 0%, #352487 100%);color:white;padding:30px;text-align:center;border-radius:10px 10px 0 0}
       .header h1{margin:0;font-size:28px}
       .content{background:#f9f9f9;padding:30px;border-radius:0 0 10px 10px}
       .details{background:white;padding:20px;border-radius:8px;margin:20px 0;border-left:4px solid #352487}
