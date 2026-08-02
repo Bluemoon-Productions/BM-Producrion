@@ -55,143 +55,103 @@ window.showLoginForm = showLoginForm;
 // Signup Form Submission
 signupFormElement.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
-    const password = document.getElementById('signupPassword').value;
+
+    const password        = document.getElementById('signupPassword').value;
     const confirmPassword = document.getElementById('signupConfirmPassword').value;
-    
-    if (password !== confirmPassword) {
-        showError('Passwords do not match!');
-        return;
-    }
-    
-    if (password.length < 6) {
-        showError('Password must be at least 6 characters long!');
-        return;
-    }
-    
+
+    if (password !== confirmPassword) { showError('Passwords do not match!'); return; }
+    if (password.length < 6)          { showError('Password must be at least 6 characters!'); return; }
+
     const formData = {
-        action: CONFIG.ACTIONS.SIGNUP,
-        fullName: document.getElementById('signupFullName').value,
+        action:    CONFIG.ACTIONS.SIGNUP,
+        fullName:  document.getElementById('signupFullName').value,
         stageName: document.getElementById('signupStageName').value,
-        email: document.getElementById('signupEmail').value,
-        phone: document.getElementById('signupPhone').value,
-        password: password
+        email:     document.getElementById('signupEmail').value,
+        phone:     document.getElementById('signupPhone').value,
+        password
     };
-    
+
     try {
         showLoading(true);
-        
         const response = await fetch(CONFIG.SCRIPT_URL, {
             method: 'POST',
-            mode: 'no-cors',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify(formData)
         });
-        
+        const text = await response.text();
+        let result;
+        try { result = JSON.parse(text); }
+        catch(pe) { throw new Error('Bad response'); }
         showLoading(false);
-        showSuccess('Account created successfully! Please login.');
-        
-        setTimeout(() => {
+
+        if (result.success) {
+            await showSuccess('Account created! Please wait for admin approval before logging in.');
             showLoginForm();
             signupFormElement.reset();
-        }, 2000);
-        
+        } else {
+            showError(result.error || 'Signup failed. Please try again.');
+        }
     } catch (error) {
         showLoading(false);
-        console.error('Error:', error);
-        showSuccess('Account created successfully! Please login.');
-        
-        setTimeout(() => {
-            showLoginForm();
-            signupFormElement.reset();
-        }, 2000);
+        console.error('Signup error:', error);
+        showError('Signup failed. Please try again.');
     }
 });
 
 // Login Form Submission
 loginFormElement.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
-    
-    const formData = {
-        action: CONFIG.ACTIONS.LOGIN,
-        email: email,
-        password: password
-    };
-    
+
+    // Trim + normalize — handles autofill spaces, case issues
+    const email    = document.getElementById('loginEmail').value.trim().toLowerCase();
+    const password = document.getElementById('loginPassword').value.trim();
+
+    if (!email || !password) {
+        showError('Please enter your email and password.');
+        return;
+    }
+
     try {
         showLoading(true);
-        
+
         const response = await fetch(CONFIG.SCRIPT_URL, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'text/plain',
-            },
-            body: JSON.stringify(formData)
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: CONFIG.ACTIONS.LOGIN, email, password })
         });
-        
-        const result = await response.json();
+
+        const text = await response.text();
+        let result;
+        try { result = JSON.parse(text); }
+        catch(pe) { throw new Error('Bad response: ' + text.substring(0, 100)); }
         showLoading(false);
-        
+
         if (result.success) {
             const user = {
-                fullName: result.user.fullName,
+                fullName:  result.user.fullName,
                 stageName: result.user.stageName,
-                email: result.user.email,
-                phone: result.user.phone,
-                status: result.user.status,
-                role: result.user.role
+                email:     result.user.email,
+                phone:     result.user.phone,
+                status:    result.user.status,
+                role:      result.user.role
             };
-            
             localStorage.setItem('user', JSON.stringify(user));
-            
-            showSuccess('Login successful!');
-            
-            setTimeout(() => {
-                authModal.style.display = 'none';
-                showUserProfile(user);
-                loginFormElement.reset();
-                if (window.themeManager) {
-                    window.themeManager.checkAdminAccess();
-                }
-            }, 1000);
+            authModal.style.display = 'none';
+            showUserProfile(user);
+            loginFormElement.reset();
+            if (window.themeManager) window.themeManager.checkAdminAccess();
         } else {
-            // Check if it's an inactive account error
-            if (result.error && result.error.includes('not active')) {
-                showError('⚠️ Account not activated! Please contact admin for approval.');
+            if (result.error && result.error.toLowerCase().includes('not active')) {
+                showError('Account not activated. Please contact admin for approval.');
             } else {
-                showError(result.error || 'Invalid email or password!');
+                showError(result.error || 'Invalid email or password.');
             }
         }
-        
+
     } catch (error) {
         showLoading(false);
-        console.error('Error:', error);
-        
-        // Fallback for no-cors mode - simulate login for testing
-        // In production, remove this and ensure proper CORS setup
-        const testUser = {
-            fullName: 'Test User',
-            stageName: 'TestStage',
-            email: email,
-            phone: '1234567890'
-        };
-        
-        localStorage.setItem('user', JSON.stringify(testUser));
-        showSuccess('Login successful!');
-        
-        setTimeout(() => {
-            authModal.style.display = 'none';
-            showUserProfile(testUser);
-            loginFormElement.reset();
-            if (window.themeManager) {
-                window.themeManager.checkAdminAccess();
-            }
-        }, 1000);
+        console.error('Login error:', error);
+        showError('Something went wrong. Please check your connection and try again.');
     }
 });
 

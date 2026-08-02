@@ -26,11 +26,27 @@ function initInvoicePage() {
 
     if (!invoiceForm) return;
 
+    // ---- Cache helpers (shared key with invoice-list.js) ----
+    const CACHE_KEY = 'bm_invoices_cache';
+
+    function saveCache(invoices) {
+        localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), invoices }));
+    }
+    function loadCache() {
+        try {
+            const c = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+            if (c && Array.isArray(c.invoices)) return c.invoices;
+        } catch(e) {}
+        return null;
+    }
+    function clearCache() { localStorage.removeItem(CACHE_KEY); }
+
+
     // ---- Payment method toggle ----
     paymentMethodSelect.addEventListener('change', (e) => {
         const v = e.target.value;
-        bankDetails.style.display = (v === 'bank' || v === 'both') ? 'block' : 'none';
-        upiDetails.style.display  = (v === 'upi'  || v === 'both') ? 'block' : 'none';
+        bankDetails.style.display = (v === 'bank') ? 'block' : 'none';
+        upiDetails.style.display  = (v === 'upi')  ? 'block' : 'none';
     });
 
     // ---- Add item row ----
@@ -42,7 +58,7 @@ function initInvoicePage() {
             <td>${rowCount}</td>
             <td><input type="text" class="item-desc" placeholder="Item description" required></td>
             <td><input type="number" class="item-qty" value="1" min="1" required></td>
-            <td><input type="number" class="item-amount" placeholder="0.00" step="0.01" required></td>
+            <td><input type="number" class="item-amount" placeholder="0" step="100" required></td>
             <td><button type="button" class="remove-item" onclick="removeItem(this)">Remove</button></td>
         `;
         itemsBody.appendChild(newRow);
@@ -150,6 +166,20 @@ function initInvoicePage() {
             return;
         }
 
+        // ---- Advance payment 30% validation ----
+        const subTotalVal = parseFloat(document.getElementById('subTotal').textContent) || 0;
+        const advanceVal  = parseFloat(document.getElementById('advancePayment').value) || 0;
+        const minAdvance  = Math.ceil(subTotalVal * 0.30);
+        if (subTotalVal > 0 && advanceVal < minAdvance) {
+            const advEl = document.getElementById('advancePayment');
+            advEl.style.borderColor = '#e94560';
+            advEl.style.boxShadow   = '0 0 10px rgba(233,69,96,0.5)';
+            setTimeout(() => { advEl.style.borderColor = ''; advEl.style.boxShadow = ''; }, 3000);
+            await customAlert(`Minimum advance payment is ₹${minAdvance} (30% of ₹${subTotalVal.toFixed(2)}).`, 'Advance Required', '⚠️');
+            advEl.focus();
+            return;
+        }
+
         const items = [];
         itemsBody.querySelectorAll('.item-row').forEach((row, i) => {
             items.push({
@@ -163,7 +193,7 @@ function initInvoicePage() {
         const paymentMethod  = document.getElementById('paymentMethod').value;
         const paymentDetails = {};
 
-        if (paymentMethod === 'bank' || paymentMethod === 'both') {
+        if (paymentMethod === 'bank') {
             paymentDetails.bank = {
                 accountHolder: document.getElementById('accountHolder').value,
                 bankName:      document.getElementById('bankName').value,
@@ -174,7 +204,7 @@ function initInvoicePage() {
                 swiftCode:     document.getElementById('swiftCode').value
             };
         }
-        if (paymentMethod === 'upi' || paymentMethod === 'both') {
+        if (paymentMethod === 'upi') {
             paymentDetails.upi = {
                 upiId: document.getElementById('upiId').value,
                 name:  document.getElementById('upiName').value
@@ -231,13 +261,14 @@ function initInvoicePage() {
             showInvoiceLoading(true, 'Generating invoice...');
             const response = await fetch(CONFIG.SCRIPT_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'text/plain' },
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(invoiceData)
             });
             const result = await response.json();
             showInvoiceLoading(false);
 
             if (result.success) {
+                clearCache();
                 await customAlert(
                     `Invoice generated successfully!<br><strong>Invoice No:</strong> ${invoiceData.invoiceNo}<br>PDF saved to Google Drive.`,
                     'Success', '✓', result.pdfUrl || null,
@@ -296,32 +327,52 @@ function initInvoicePage() {
         if (e.target === invoiceListModal) invoiceListModal.style.display = 'none';
     });
 
+    function renderInvoiceListItems(invoices) {
+        const statusColor = s => s === 'Paid' ? '#28a745' : s === 'Rejected' ? '#e94560' : '#ffc107';
+        // hide final paid and final not paid — only show editable invoices
+        const editable = invoices.filter(inv => {
+            if (inv.status !== 'Paid') return true;
+            const fp = (inv.finalPayment || '').trim();
+            const rm = (inv.remark || '').trim();
+            return !fp && !rm; // advance paid only
+        });
+        if (!editable.length) {
+            invoiceListContainer.innerHTML = '<p style="text-align:center;color:#666">No editable invoices.</p>';
+            return;
+        }
+        invoiceListContainer.innerHTML = editable.map(inv => `
+            <div class="invoice-item">
+                <div class="invoice-info">
+                    <h3>#${inv.invoiceNo}</h3>
+                    <p><i class="fas fa-user"></i> ${inv.customerName}</p>
+                    <p><i class="fas fa-phone"></i> ${inv.customerPhone || ''}</p>
+                    <p><i class="fas fa-calendar"></i> ${new Date(inv.timestamp).toLocaleDateString()}</p>
+                    <p><i class="fas fa-tag"></i> <span style="color:${statusColor(inv.status)}">${inv.status}</span></p>
+                    <p class="inv-amt">₹${(inv.advancePayment||0).toLocaleString('en-IN')} / ₹${(inv.totalAmount||0).toLocaleString('en-IN')}</p>
+                </div>
+                <div class="invoice-actions">
+                    <button class="inv-btn inv-preview" onclick="previewInvoice('${inv.pdfUrl}')"><i class="fas fa-eye"></i><span>Preview</span></button>
+                    <button class="inv-btn inv-share"   onclick="shareInvoiceItem('${inv.pdfUrl}','${inv.invoiceNo}','${inv.customerName}')"><i class="fas fa-share-alt"></i><span>Share</span></button>
+                    <button class="inv-btn inv-update"  onclick="editInvoice('${inv.invoiceNo}')"><i class="fas fa-pen"></i><span>Edit</span></button>
+                </div>
+            </div>
+        `).join('');
+    }
+
     async function loadInvoiceList() {
+        const cached = loadCache();
+        if (cached) { renderInvoiceListItems(cached); return; }
+        invoiceListContainer.innerHTML = '<div style="text-align:center;padding:30px"><div class="list-spinner" style="margin:0 auto"></div></div>';
         try {
-            invoiceListContainer.innerHTML = '<p>Loading invoices...</p>';
             const response = await fetch(CONFIG.SCRIPT_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'text/plain' },
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: CONFIG.ACTIONS.GET_INVOICES })
             });
             const result = await response.json();
             if (result.success && result.invoices.length > 0) {
-                invoiceListContainer.innerHTML = result.invoices.map(inv => `
-                    <div class="invoice-item">
-                        <div class="invoice-info">
-                            <h3>Invoice #${inv.invoiceNo}</h3>
-                            <p><strong>Customer:</strong> ${inv.customerName}</p>
-                            <p><strong>Amount:</strong> ₹${inv.totalAmount}</p>
-                            <p><strong>Date:</strong> ${new Date(inv.timestamp).toLocaleDateString()}</p>
-                            <p><strong>Status:</strong> <span style="color:#28a745">${inv.status}</span></p>
-                        </div>
-                        <div class="invoice-actions">
-                            <button class="invoice-btn preview-btn" onclick="previewInvoice('${inv.pdfUrl}')">👁️ Preview</button>
-                            <button class="invoice-btn share-btn"   onclick="shareInvoice('${inv.pdfUrl}','${inv.invoiceNo}')">📤 Share</button>
-                            <button class="invoice-btn edit-btn"    onclick="editInvoice('${inv.invoiceNo}')">✏️ Edit</button>
-                        </div>
-                    </div>
-                `).join('');
+                saveCache(result.invoices);
+                renderInvoiceListItems(result.invoices);
             } else {
                 invoiceListContainer.innerHTML = '<p style="text-align:center;color:#666">No invoices found.</p>';
             }
@@ -355,20 +406,35 @@ function initInvoicePage() {
         if (!pdfUrl || pdfUrl.includes('Error')) {
             await customAlert('PDF not available.', 'Not Available', 'ℹ️'); return;
         }
-        if (navigator.share) {
-            navigator.share({ title: `Invoice ${invoiceNo}`, url: pdfUrl }).catch(() => {});
-        } else {
-            navigator.clipboard.writeText(pdfUrl)
-                .then(async () => await customAlert('Link copied!', 'Copied', '📋'))
-                .catch(() => prompt('Copy this link:', pdfUrl));
+        let fileId = '';
+        if (pdfUrl.includes('/d/'))  fileId = pdfUrl.split('/d/')[1].split('/')[0];
+        else if (pdfUrl.includes('id=')) fileId = pdfUrl.split('id=')[1].split('&')[0];
+        const link = fileId ? `https://drive.google.com/file/d/${fileId}/view` : pdfUrl;
+        const text = `Invoice ${invoiceNo}\n${link}`;
+        navigator.clipboard.writeText(text)
+            .then(async () => await customAlert('Link copied!', 'Copied', '📋'))
+            .catch(() => prompt('Copy this link:', link));
+    };
+
+    window.shareInvoiceItem = async function (pdfUrl, invoiceNo, customerName) {
+        if (!pdfUrl || pdfUrl.includes('Error')) {
+            await customAlert('PDF not available.', 'Not Available', 'ℹ️'); return;
         }
+        let fileId = '';
+        if (pdfUrl.includes('/d/'))  fileId = pdfUrl.split('/d/')[1].split('/')[0];
+        else if (pdfUrl.includes('id=')) fileId = pdfUrl.split('id=')[1].split('&')[0];
+        const link = fileId ? `https://drive.google.com/file/d/${fileId}/view` : pdfUrl;
+        const text = `Hii ${customerName},\nPlease find the invoice here: ${invoiceNo}\n${link}`;
+        navigator.clipboard.writeText(text)
+            .then(async () => await customAlert('Link copied!', 'Copied', '📋'))
+            .catch(() => prompt('Copy this link:', link));
     };
 
     window.editInvoice = async function (invoiceNo) {
         try {
             const response = await fetch(CONFIG.SCRIPT_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'text/plain' },
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: CONFIG.ACTIONS.GET_INVOICE_DETAILS, invoiceNo })
             });
             const result = await response.json();

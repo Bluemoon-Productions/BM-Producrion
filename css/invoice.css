@@ -25,9 +25,22 @@ body {
     z-index: 10;
 }
 
+.top-nav-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
 .invoice-logo {
     width: 200px;
     border-radius: 10px;
+}
+
+.inv-amt {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #5dde7a;
+    margin-top: 6px;
 }
 
 .back-btn {
@@ -63,27 +76,72 @@ body {
 }
 
 .view-invoices-btn {
-    background: rgba(255,255,255,0.06);
-    color: rgba(255,255,255,0.85);
-    border: 1px solid rgba(255,255,255,0.12);
-    padding: 10px 22px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 22px;
+    background: linear-gradient(135deg, var(--highlight-color), #6a3de8);
+    color: white;
+    border: none;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+    font-weight: 600;
     font-family: inherit;
-    transition: all 0.3s;
-    backdrop-filter: blur(10px);
+    letter-spacing: 0.5px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
 }
 
+.view-invoices-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.15);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.view-invoices-btn:hover::before { opacity: 1; }
 .view-invoices-btn:hover {
-    background: rgba(53,36,135,0.4);
-    border-color: var(--highlight-color);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(53,36,135,0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(53,36,135,0.5);
 }
 
-/* ---- INVOICE HEADER ---- */
-.invoice-header {
+/* ---- SHARED PAGE HEADER ---- */
+.page-header {
+    text-align: center;
+    margin-bottom: 36px;
+    position: relative;
+    z-index: 2;
+}
+
+.page-header h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.4rem;
+    background: linear-gradient(135deg, #fff 0%, var(--highlight-color) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+    letter-spacing: -1px;
+}
+
+.page-header p {
+    color: rgba(255,255,255,0.4);
+    font-size: 1rem;
+    margin: 0;
+}
+
+/* ---- SIDEBAR FAVICON ---- */
+.sidebar-favicon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    object-fit: contain;
+}
     text-align: center;
     margin-bottom: 36px;
     position: relative;
@@ -626,8 +684,10 @@ body {
     body { cursor: auto; }
     .cursor-dot, .cursor-ring { display: none; }
 
-    .top-nav-bar { flex-direction: column; gap: 12px; }
+    .top-nav-bar { flex-direction: column-reverse; gap: 12px; }
+    .top-nav-left { flex-direction: column; width: 100%; }
     .back-btn, .view-invoices-btn { width: 100%; text-align: center; justify-content: center; }
+    .page-header h1 { font-size: 1.6rem; }
 
     .invoice-form { padding: 20px; }
     .form-row { grid-template-columns: 1fr; }
@@ -1146,9 +1206,59 @@ body {
     box-shadow: 0 0 16px rgba(53,36,135,0.35);
 }
 
-.status-done-btn {
-    display: none;
+.list-spinner {
+    width: 52px;
+    height: 52px;
+    border: 4px solid rgba(255,255,255,0.15);
+    border-top-color: var(--highlight-color, #352487);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
 }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.prompt-input {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.95rem;
+    resize: vertical;
+    box-sizing: border-box;
+}
+.prompt-input:focus { outline: none; border-color: var(--highlight-color); }
+
+.fp-btn, .sa-btn, .fp-type-btn {
+    flex: 1;
+    padding: 10px 8px;
+    border-radius: 10px;
+    border: 2px solid rgba(255,255,255,0.15);
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.25s;
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.6);
+}
+.fp-btn.active, .sa-btn.active, .fp-type-btn.active {
+    background: rgba(53,36,135,0.3);
+    color: #b48aff;
+    border-color: rgba(155,109,255,0.6);
+    box-shadow: 0 0 14px rgba(53,36,135,0.3);
+}
+
+.fp-prefilled {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 12px 14px;
+}
+.fp-prefilled p { margin: 6px 0; font-size: 0.9rem; color: rgba(255,255,255,0.75); }
+.fp-prefilled .remark-label { margin-right: 6px; }
 
 .status-modal-actions {
     display: grid;
